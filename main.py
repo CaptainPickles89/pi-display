@@ -37,7 +37,8 @@ def fetch_weather():
 def display_image(image_path):
     try:
         img = Image.open(image_path)
-        inky_display.set_image(img)
+        resizedimage = img.resize(inky.resolution)
+        inky_display.set_image(resizedimage)
         inky_display.show()
     except Exception as e:
         print(f"Failed to display image: {e}")
