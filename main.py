@@ -1,10 +1,16 @@
 import os
 import random
 import time
+import platform
 from PIL import Image, ImageDraw, ImageFont
-from inky.auto import auto
 from gpiozero import Button
 import requests
+
+# Use a mock inky lib for windows and the real one for Pi
+if platform.system() == "Windows":
+    from mock_inky.auto import auto
+else:
+    from inky.auto import auto
 
 # Initialize the Inky Impression
 inky_display = auto()

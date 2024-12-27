@@ -1,0 +1,5 @@
+# Ignore virtual environment
+.venv/
+
+# Ignore mock_inky directory
+mock_inky/
