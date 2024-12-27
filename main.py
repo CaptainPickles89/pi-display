@@ -23,89 +23,17 @@ image_dir = "/home/danny/Pictures"  # Change to your image directory
 
 def get_stock(symbol):
     try:
-        subprocess.run(['python3', 'stocks.py', symbol])
+        result=subprocess.run(
+            ['python3', 'stocks.py', symbol],
+            capture_output=True,
+            text=True,
+            check=True
+            )
+        image_path=result.stdout.strip()
+        print(f"Displaying stock graph from {image_path}")
+        display_image(image_path)
     except Exception as e:
         print(f"Failed to get stock data for {symbol}: {e}")
-
-# def plot_stock_graph(prices):
-#     fig, ax = plt.subplots(figsize=(5, 3))  # Adjust the size to fit the screen
-    
-#     # Plot a simple line chart for the stock prices
-#     ax.plot(prices, color='blue', label="Stock Price")
-    
-#     # Set labels and title
-#     ax.set_title("Stock Price Over Time")
-#     ax.set_xlabel("Time")
-#     ax.set_ylabel("Price")
-    
-#     # Save the plot as a PNG image in memory
-#     buf = io.BytesIO()
-#     plt.savefig(buf, format='png')
-#     buf.seek(0)
-#     img = Image.open(buf)
-#     buf.close()
-#     print(f"Stock data plotted")
-    
-#     return img
-
-# def display_stock_graph(image):
-#     # Initialize the Inky display
-#     inky = auto()
-    
-#     # Display the image (graph) on the Inky display
-#     inky.set_image(image)
-#     inky.show()
-
-# def fetch_opening_price(symbol="IGG.L"):
-#     api_key = load_api_key()
-#     url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={api_key}'
-#     response = requests.get(url)
-#     data = response.json()
-    
-#     if "Time Series (Daily)" in data:
-#         latest_day = list(data['Time Series (Daily)'].keys())[0]
-#         opening_price = float(data['Time Series (Daily)'][latest_day]['1. open'])
-#         print(f"Stock opened at {opening_price}, latest: {latest_day}")
-#         return opening_price
-#     else:
-#         print("Error fetching opening price")
-#         return None
-    
-# def ig_stock():
-#     symbol = "IGG.L"  # The stock symbol you want to track
-    
-#     while True:
-#         # Fetch current stock price
-#         current_price = fetch_stock_data(symbol)
-        
-#         if current_price:
-#             # Fetch the opening price (for up/down comparison)
-#             opening_price = fetch_opening_price(symbol)
-            
-#             if opening_price:
-#                 # Compare and get the up/down status
-#                 up_down_status = display_up_down_info(current_price, opening_price)
-#                 print(up_down_status)  # Print to console or use Inky to show status
-                
-#                 # Generate the graph with the latest stock prices
-#                 prices = [current_price]  # For simplicity, we only use the current price for now
-#                 graph_image = plot_stock_graph(prices)
-                
-#                 # Display the graph on the Inky screen
-#                 display_stock_graph(graph_image)
-                
-#         # Wait for 5 minutes before refreshing the data
-#         time.sleep(300)  # 5 minutes    
-
-
-# def display_up_down_info(current_price, opening_price):
-#     # Check if the stock is up or down for the day
-#     if current_price > opening_price:
-#         return "Stock is UP today!"
-#     elif current_price < opening_price:
-#         return "Stock is DOWN today!"
-#     else:
-#         return "Stock price is the SAME today."
 
 
 # Bedfordshire weather API setup (use OpenWeatherMap as an alternative source)

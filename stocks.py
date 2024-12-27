@@ -5,7 +5,7 @@ from PIL import Image
 def fetch_and_display_stock(symbol):
     # Fetch stock data
     stock = yf.Ticker(symbol)
-    hist = stock.history(period="7d")  # Get data for the last 7 days
+    hist = stock.history(period="5d")  # Get data for the last 7 days
     
     if hist.empty:
         print(f"No data found for {symbol}")
@@ -35,8 +35,9 @@ def fetch_and_display_stock(symbol):
     plt.close()
 
     # Display the graph on the Inky
-    display_image(graph_path)
+    print(graph_path)
+    return graph_path
 
 # Example usage
-symbol = "IGG.L"  # LSE ticker for IG Group
+# symbol = "IGG.L"  # LSE ticker for IG Group
 fetch_and_display_stock(symbol)
