@@ -5,15 +5,10 @@ import platform
 from PIL import Image, ImageDraw, ImageFont
 from gpiozero import Button
 import requests
-
-# Use a mock inky lib for windows and the real one for Pi
-if platform.system() == "Windows":
-    from mock_inky.auto import auto
-else:
-    from inky.auto import auto
+from inky import InkyWHAT
 
 # Initialize the Inky Impression
-inky_display = auto()
+inky_display = InkyWHAT()
 inky_display.set_border(inky_display.WHITE)
 
 # Button setup
@@ -41,9 +36,10 @@ def fetch_weather():
 
 # Display an image
 def display_image(image_path):
+    print(f"Display resolution: {inky_display.resolution}")
     try:
         img = Image.open(image_path)
-        resizedimage = img.resize(inky.resolution)
+        resizedimage = img.resize(inky_display.resolution)
         inky_display.set_image(resizedimage)
         inky_display.show()
     except Exception as e:
