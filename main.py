@@ -1,7 +1,7 @@
 import os
 import random
 import time
-import platform
+import subprocess
 from PIL import Image, ImageDraw, ImageFont
 from gpiozero import Button
 import requests
@@ -39,12 +39,8 @@ def fetch_weather():
 
 # Display an image
 def display_image(image_path):
-    print(f"Display resolution: {inky_display.resolution}")
     try:
-        img = Image.open(image_path)
-        resizedimage = img.resize(inky_display.resolution)
-        inky_display.set_image(resizedimage)
-        inky_display.show()
+        subprocess.run(['python3', 'image.py', image_path])
     except Exception as e:
         print(f"Failed to display image: {e}")
 
