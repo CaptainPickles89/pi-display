@@ -129,8 +129,8 @@ def fetch_weather():
 # Display an image
 def display_image(image_path):
     try:
-        subprocess.run(['python3', 'image.py', image_path])
         print(f"Now loading {image_path} to display")
+        subprocess.run(['python3', 'image.py', image_path])
     except Exception as e:
         print(f"Failed to display image: {e}")
 
