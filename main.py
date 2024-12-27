@@ -130,6 +130,7 @@ def fetch_weather():
 def display_image(image_path):
     try:
         subprocess.run(['python3', 'image.py', image_path])
+        print(f"Now loading {image_path} to display")
     except Exception as e:
         print(f"Failed to display image: {e}")
 
@@ -150,7 +151,7 @@ def display_weather():
 # Main loop
 def main():
     image_files = [os.path.join(image_dir, f) for f in os.listdir(image_dir) if f.endswith(('.png', '.jpg', '.jpeg'))]
-    display_functions = [lambda: display_image(random.choice(image_files)), get_stock('IGG.L')]
+    display_functions = [lambda: display_image(random.choice(image_files)), lambda: get_stock("IGG.L"),]
     
     current_index = 0
 
