@@ -2,6 +2,7 @@ import os
 import random
 import time
 import subprocess
+from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
 from gpiozero import Button
 import requests
@@ -30,6 +31,7 @@ def fetch_weather():
         response.raise_for_status()
         data = response.json()
         weather = data["current_weather"]
+        print(f"Weather returned: {weather.temperature}")
         return f"{weather['temperature']}°C, {weather['weathercode']} ({weather['windspeed']} km/h wind)"
     except Exception as e:
         return f"Error fetching weather: {e}"
@@ -53,6 +55,7 @@ def display_weather():
         inky_display.show()
     except Exception as e:
         print(f"Failed to display weather: {e}")
+
 
 # Main loop
 def main():

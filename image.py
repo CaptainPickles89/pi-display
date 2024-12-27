@@ -9,7 +9,7 @@ from PIL import Image
 from inky.auto import auto
 
 def display_image(image_path):
-    inky = auto
+    inky = auto()
     image = Image.open(image_path)
     saturation = 0.5
     resizedimage = image.resize(inky.resolution)

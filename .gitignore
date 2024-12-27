@@ -3,3 +3,6 @@
 
 # Ignore mock_inky directory
 mock_inky/
+
+# Ignore API key
+google-key.json
