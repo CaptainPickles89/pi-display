@@ -14,7 +14,7 @@ inky_display.set_border(inky_display.WHITE)
 button_a = Button(5)  # Adjust GPIO pin number if needed
 
 # Paths
-image_dir = "~/Pictures/"  # Change to your image directory
+image_dir = "/home/danny/Pictures"  # Change to your image directory
 
 # Bedfordshire weather API setup (use OpenWeatherMap as an alternative source)
 def fetch_weather():
