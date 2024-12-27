@@ -11,6 +11,9 @@ from inky import InkyWHAT
 inky_display = InkyWHAT()
 inky_display.set_border(inky_display.WHITE)
 
+inky_display.width = 400
+inky_display.height = 300
+
 # Button setup
 button_a = Button(5)  # Adjust GPIO pin number if needed
 
