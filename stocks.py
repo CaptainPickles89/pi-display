@@ -1,3 +1,4 @@
+import sys
 import yfinance as yf
 import matplotlib.pyplot as plt
 
@@ -37,6 +38,8 @@ def fetch_and_display_stock(symbol):
     print(graph_path)
     return graph_path
 
-# Example usage
-# symbol = "IGG.L"  # LSE ticker for IG Group
-fetch_and_display_stock(symbol)
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        symbol = sys.argv[1]  # Get the symbol from the command-line argument
+    else:
+        print("No image path provided!")
