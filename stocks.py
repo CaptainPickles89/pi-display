@@ -1,11 +1,10 @@
 import yfinance as yf
 import matplotlib.pyplot as plt
-from PIL import Image
 
 def fetch_and_display_stock(symbol):
     # Fetch stock data
     stock = yf.Ticker(symbol)
-    hist = stock.history(period="5d")  # Get data for the last 7 days
+    hist = stock.history(period="3m")  # Get data for the last 3 months
     
     if hist.empty:
         print(f"No data found for {symbol}")
@@ -23,9 +22,9 @@ def fetch_and_display_stock(symbol):
     # Plot a graph of the stock's performance
     plt.figure(figsize=(4, 3))  # Adjust size to fit the Inky display
     plt.plot(hist.index, hist["Close"], marker="o", label="Closing Price", color="blue")
-    plt.xlabel("Date")
+    plt.xlabel("Date (M)")
     plt.ylabel("Price")
-    plt.title(f"{symbol} - 7 Day Performance")
+    plt.title(f"{symbol} - 3 Month Performance")
     plt.grid(True)
     plt.legend()
 

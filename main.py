@@ -23,13 +23,8 @@ image_dir = "/home/danny/Pictures"  # Change to your image directory
 
 def get_stock(symbol):
     try:
-        result=subprocess.run(
-            ['python3', 'stocks.py', symbol],
-            capture_output=True,
-            text=True,
-            check=True
-            )
-        image_path=result.stdout.strip()
+        subprocess.run(['python3', 'stocks.py', symbol])
+        image_path="/tmp/stock_graph.png"
         print(f"Displaying stock graph from {image_path}")
         display_image(image_path)
     except Exception as e:
