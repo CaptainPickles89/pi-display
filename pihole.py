@@ -88,7 +88,7 @@ def show_pihole_stats():
     stats = fetch_pihole_stats()
     if stats:
         display_pihole_stats(stats)
-        return "Success"
+        return
     else:
         print("Failed to display Pi-hole stats.")
         return None

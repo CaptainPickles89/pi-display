@@ -33,8 +33,10 @@ def get_stock(symbol):
 def show_pihole():
     try:
         subprocess.run(["python3", "pihole.py"])
+        return 0  # success
     except Exception as e:
         print(f"Failed to get stock pihole data: {e}")
+        return 1  # failure
 
 
 # Bedfordshire weather API setup (use OpenWeatherMap as an alternative source)
