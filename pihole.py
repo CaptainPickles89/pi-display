@@ -49,7 +49,7 @@ def load_api_key():
 def display_pihole_stats(stats):
     # Prepare the display
     inky = auto()
-    img = Image.new("P", inky.resolution, color=1)
+    img = Image.open("./resources/imgs/pihole-bg1-01.png").convert("P")  # Convert to mode "P" for Inky compatibility
     draw = ImageDraw.Draw(img)
 
     # Font settings (update path to your font file)
@@ -61,7 +61,7 @@ def display_pihole_stats(stats):
         "Pi-hole Stats:\n"
         f"Ads Blocked: {stats['ads_blocked']}\n"
         f"DNS Queries: {stats['dns_queries']}\n"
-        f"% Blocked: {stats['percentage_blocked']}%"
+        f"Blocked: {stats['percentage_blocked']}%"
     )
 
     # Measure the size of the text block
