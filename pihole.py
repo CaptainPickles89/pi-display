@@ -58,7 +58,6 @@ def display_pihole_stats(stats):
 
     # Format the stats into a single block of text
     stats_text = (
-        "Pi-hole Stats:\n"
         f"Ads Blocked: {stats['ads_blocked']}\n"
         f"DNS Queries: {stats['dns_queries']}\n"
         f"Blocked: {stats['percentage_blocked']}%"
