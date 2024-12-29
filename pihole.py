@@ -64,17 +64,17 @@ def display_pihole_stats(stats):
         f"Blocked: {stats['percentage_blocked']}%"
     )
 
-    # Measure the size of the text block
-    text_bbox = draw.multiline_textbbox((0, 0), stats_text, font=font)
-    text_width = text_bbox[2] - text_bbox[0]
-    text_height = text_bbox[3] - text_bbox[1]
-    print(f"Text Width: {text_width}, Text Height: {text_height}")
+# Calculate vertical centering
+    total_height = sum(draw.textsize(line, font=font)[1] for line in stats_text) + (len(stats_text) - 1) * 10  # Add line spacing
+    image_width, image_height = img.size
+    y_position = (image_height - total_height) // 2
 
-    # Calculate the position to center the text
-    image_width, image_height = inky.resolution
-    x_position = (image_width - text_width) // 2
-    y_position = (image_height - text_height) // 2
-    print(f"Calculated Position: ({x_position}, {y_position})")
+    # Draw each line, centered horizontally
+    for line in stats_text:
+        line_width, line_height = draw.textsize(line, font=font)
+        x_position = (image_width - line_width) // 2
+        draw.text((x_position, y_position), line, font=font, fill=0)  # Black text
+        y_position += line_height + 10  # Move down for the next line (10px line spacing)
 
     # Draw the text on the image
     draw.multiline_text((x_position, y_position), stats_text, font=font, fill=0)  # 0 for black text
