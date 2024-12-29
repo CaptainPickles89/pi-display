@@ -28,6 +28,8 @@ def fetch_and_display_stock(symbol):
         # Format the x-axis to show 'XX-MMM' style labels
         ax = plt.gca()  # Get the current axis
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%d-%b'))  # Format as '10-Dec'
+        # Optional: Rotate the x-axis labels if they're cramped
+        plt.xticks(rotation=45)
         plt.xlabel("Date")
         plt.ylabel("Price")
         plt.title(f"{symbol} - 3 Month Performance")

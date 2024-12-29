@@ -30,6 +30,12 @@ def get_stock(symbol):
     except Exception as e:
         print(f"Failed to get stock data for {symbol}: {e}")
 
+def show_pihole():
+    try:
+        subprocess.run(["python3", "pihole.py"])
+    except Exception as e:
+        print(f"Failed to get stock pihole data: {e}")
+
 
 # Bedfordshire weather API setup (use OpenWeatherMap as an alternative source)
 def fetch_weather():
@@ -74,7 +80,7 @@ def display_weather():
 # Main loop
 def main():
     image_files = [os.path.join(image_dir, f) for f in os.listdir(image_dir) if f.endswith(('.png', '.jpg', '.jpeg'))]
-    display_functions = [lambda: display_image(random.choice(image_files)), lambda: get_stock("IGG.L"),]
+    display_functions = [show_pihole(), lambda: display_image(random.choice(image_files)), lambda: get_stock("IGG.L"),]
     
     current_index = 0
 
