@@ -63,7 +63,7 @@ def display_pihole_stats(stats):
         f"Blocked: {stats['percentage_blocked']}%"
     )
 
- # Measure text size
+    # Measure text size
     text_bbox = draw.multiline_textbbox((0, 0), stats_text, font=font)
     text_width = text_bbox[2] - text_bbox[0]
     text_height = text_bbox[3] - text_bbox[1]
