@@ -49,7 +49,7 @@ def load_api_key():
 def display_pihole_stats(stats):
     # Prepare the display
     inky = auto()
-    img = Image.new("P", inky.resolution)
+    img = Image.new("P", inky.resolution, color=1)
     draw = ImageDraw.Draw(img)
 
     # Font settings (update path to your font file)
@@ -78,6 +78,9 @@ def display_pihole_stats(stats):
 
     # Draw the text on the image
     draw.multiline_text((x_position, y_position), stats_text, font=font, fill=0)  # 0 for black text
+
+    # Debug: Save the image to check the output
+    img.save("/tmp/debug_output.png")
 
     # Show on the Inky
     inky.set_image(img)
