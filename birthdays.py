@@ -69,5 +69,8 @@ def check_birthdays(birthdays: dict) -> None:
             print("No birthdays today")
 
 if __name__ == "__main__":
-    read_birthdays()
-
+    if len(sys.argv) > 1:
+        file_path = sys.argv[1]  # Get the file path from the command-line argument
+        read_birthdays(file_path)
+    else:
+        print("No image path provided!")
