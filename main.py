@@ -85,8 +85,11 @@ def main():
     current_index = 0
 
     while True:
-        # Display current item
-        display_functions[current_index]()
+        # Check if the function is callable (i.e., not None)
+        if display_functions[current_index]:
+           display_functions[current_index]()
+        else:
+           print(f"Error: Function at index {current_index} is None")
         
         # Wait for 10 minutes or button press
         start_time = time.time()
