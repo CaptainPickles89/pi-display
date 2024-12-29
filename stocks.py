@@ -22,13 +22,12 @@ def fetch_and_display_stock(symbol):
         # Display current stock price and direction
         print(f"The latest closing price for {symbol} is {latest_close:.2f} ({direction}{abs(price_change):.2f})")
 
-        # Format the x-axis to show 'XX-MMM' style labels
-        ax = plt.gca()  # Get the current axis
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%d-%b'))  # Format as '10-Dec'
-
         # Plot a graph of the stock's performance
         plt.figure(figsize=(4, 3))  # Adjust size to fit the Inky display
         plt.plot(hist.index, hist["Close"], marker="o", label="Closing Price", color="blue")
+        # Format the x-axis to show 'XX-MMM' style labels
+        ax = plt.gca()  # Get the current axis
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%d-%b'))  # Format as '10-Dec'
         plt.xlabel("Date")
         plt.ylabel("Price")
         plt.title(f"{symbol} - 3 Month Performance")
