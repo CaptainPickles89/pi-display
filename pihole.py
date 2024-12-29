@@ -54,7 +54,7 @@ def display_pihole_stats(stats):
 
     # Font settings (update path to your font file)
     font_path = "/usr/share/fonts/truetype/roboto/unhinted/RobotoCondensed-Medium.ttf"
-    font = ImageFont.truetype(font_path, 20)
+    font = ImageFont.truetype(font_path, 50)
 
     # Format the stats into a single block of text
     stats_text = (
