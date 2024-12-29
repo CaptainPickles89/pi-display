@@ -65,7 +65,7 @@ def display_pihole_stats(stats):
     )
 
      # Measure the size of the text block
-    text_width, text_height = draw.multiline_textsize(stats_text, font=font)
+    text_width, text_height = draw.multiline_textbbox(stats_text, font=font)
     print(f"Text Width: {text_width}, Text Height: {text_height}")
 
     # Calculate the position to center the text
