@@ -19,6 +19,7 @@ def read_birthdays(file_path: str) -> dict:
     try:
         with open(file_path, 'r') as file:
             birthdays = json.load(file)
+        check_birthdays(birthdays)
         return birthdays
     except Exception as e:
         print(f"Error reading the file: {e}")
@@ -67,5 +68,6 @@ def check_birthdays(birthdays: dict) -> None:
         else:
             print("No birthdays today")
 
-
+if __name__ == "__main__":
+    read_birthdays()
 
