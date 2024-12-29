@@ -22,7 +22,7 @@ def fetch_pihole_stats():
         dns_queries_today = data.get("dns_queries_today", "N/A")
         percentage_blocked = data.get("ads_percentage_today", "N/A")
 
-        print(f"Pihole stats returned {percentage_blocked} blocked so far today")
+        print(f"Pihole stats returned {percentage_blocked}% blocked so far today")
 
         return {
             "ads_blocked": ads_blocked_today,
@@ -66,14 +66,17 @@ def display_pihole_stats(stats):
 
      # Measure the size of the text block
     text_width, text_height = draw.multiline_textsize(stats_text, font=font)
+    print(f"Text Width: {text_width}, Text Height: {text_height}")
 
     # Calculate the position to center the text
     image_width, image_height = inky.resolution
     x_position = (image_width - text_width) // 2
     y_position = (image_height - text_height) // 2
+    print(f"Calculated Position: ({x_position}, {y_position})")
 
     # Draw the text on the image
-    draw.multiline_text((x_position, y_position), stats_text, font=font, fill=inky.BLACK)
+    draw.multiline_text((x_position, y_position), stats_text, font=font, fill=0)
+    img.save("/tmp/debug_output.png")
 
     # Show on the Inky
     inky.set_image(img)
