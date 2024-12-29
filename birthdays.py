@@ -6,7 +6,7 @@ from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
 from inky.auto import auto
 
-def read_birthdays():
+def read_birthdays(file_path: str) -> dict:
     """
     Read birthdays from a JSON file and return as a dictionary.
     
@@ -17,7 +17,7 @@ def read_birthdays():
         dict: A dictionary with names as keys and birthdates as values.
     """
     try:
-        with open("./birthdays.json", 'r') as file:
+        with open(file_path, 'r') as file:
             birthdays = json.load(file)
         return birthdays
     except Exception as e:
