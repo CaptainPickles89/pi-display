@@ -27,8 +27,10 @@ def get_stock(symbol):
         image_path="/tmp/stock_graph.png"
         print(f"Displaying stock graph from {image_path}")
         display_image(image_path)
+        return 0  # success
     except Exception as e:
         print(f"Failed to get stock data for {symbol}: {e}")
+        return 1  # failure
 
 def show_pihole():
     try:
@@ -40,22 +42,13 @@ def show_pihole():
 
 
 # Bedfordshire weather API setup (use OpenWeatherMap as an alternative source)
-def fetch_weather():
+def screen_clear():
     try:
-        url = "https://api.open-meteo.com/v1/forecast"
-        params = {
-            "latitude": 52.135,  # Approx Bedfordshire latitude
-            "longitude": -0.468,  # Approx Bedfordshire longitude
-            "current_weather": True,
-        }
-        response = requests.get(url, params=params)
-        response.raise_for_status()
-        data = response.json()
-        weather = data["current_weather"]
-        print(f"Weather returned: {weather.temperature}")
-        return f"{weather['temperature']}°C, {weather['weathercode']} ({weather['windspeed']} km/h wind)"
+        subprocess.run(["python3", "clear.py"])
+        return 0  # success
     except Exception as e:
-        return f"Error fetching weather: {e}"
+        print(f"Failed to clear display: {e}")
+        return 1  # failure
 
 # Display an image
 def display_image(image_path):
@@ -64,19 +57,6 @@ def display_image(image_path):
         subprocess.run(['python3', 'image.py', image_path])
     except Exception as e:
         print(f"Failed to display image: {e}")
-
-# Display weather information
-def display_weather():
-    try:
-        weather_info = fetch_weather()
-        img = Image.new("P", inky_display.resolution)
-        draw = ImageDraw.Draw(img)
-        font = ImageFont.load_default()  # Replace with a custom font if desired
-        draw.text((10, 10), weather_info, inky_display.BLACK, font=font)
-        inky_display.set_image(img)
-        inky_display.show()
-    except Exception as e:
-        print(f"Failed to display weather: {e}")
 
 
 # Main loop

@@ -5,4 +5,6 @@
 mock_inky/
 
 # Ignore credentials folder
-creds/
+creds/google-key.json
+creds/pihole-api.txt
+creds/alphavantage-api.txt
