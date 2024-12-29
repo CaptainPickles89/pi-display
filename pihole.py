@@ -53,14 +53,27 @@ def display_pihole_stats(stats):
     draw = ImageDraw.Draw(img)
 
     # Font settings (update path to your font file)
-    font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+    font_path = "/usr/share/fonts/truetype/roboto/unhinted/RobotoCondensed-Medium.ttf"
     font = ImageFont.truetype(font_path, 20)
 
-    # Display the stats
-    draw.text((10, 10), "Pi-hole Stats:", font=font, fill=inky.BLACK)
-    draw.text((10, 40), f"Ads Blocked: {stats['ads_blocked']}", font=font, fill=inky.RED)
-    draw.text((10, 70), f"DNS Queries: {stats['dns_queries']}", font=font, fill=inky.BLACK)
-    draw.text((10, 100), f"% Blocked: {stats['percentage_blocked']}%", font=font, fill=inky.BLACK)
+    # Format the stats into a single block of text
+    stats_text = (
+        "Pi-hole Stats:\n"
+        f"Ads Blocked: {stats['ads_blocked']}\n"
+        f"DNS Queries: {stats['dns_queries']}\n"
+        f"% Blocked: {stats['percentage_blocked']}%"
+    )
+
+     # Measure the size of the text block
+    text_width, text_height = draw.multiline_textsize(stats_text, font=font)
+
+    # Calculate the position to center the text
+    image_width, image_height = inky.resolution
+    x_position = (image_width - text_width) // 2
+    y_position = (image_height - text_height) // 2
+
+    # Draw the text on the image
+    draw.multiline_text((x_position, y_position), stats_text, font=font, fill=inky.BLACK)
 
     # Show on the Inky
     inky.set_image(img)
