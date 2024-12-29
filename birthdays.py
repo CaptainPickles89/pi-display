@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import json
+import sys
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
 from inky.auto import auto
