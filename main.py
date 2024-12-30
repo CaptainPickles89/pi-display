@@ -2,13 +2,13 @@ import os
 import random
 import time
 import subprocess
+import warnings
 import matplotlib.pyplot as plt
 import yfinance as yf
 import io
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
 from gpiozero import Button
-import requests
 from inky.auto import auto
 
 # Initialize the Inky Impression
@@ -49,7 +49,7 @@ def check_birthdays():
         return 1  # failure
 
 
-# Bedfordshire weather API setup (use OpenWeatherMap as an alternative source)
+# Clear the e-ink screen 
 def screen_clear():
     try:
         subprocess.run(["python3", "clear.py"])

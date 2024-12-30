@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-import pathlib
+import warnings
 import sys
 
 from PIL import Image
@@ -13,10 +13,12 @@ def display_image(image_path):
     image = Image.open(image_path)
     saturation = 0.5
     resizedimage = image.resize(inky.resolution)
-    try:
-        inky.set_image(resizedimage, saturation=saturation)
-    except TypeError:
-        inky.set_image(resizedimage)
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="Busy Wait: Held high")
+        try:
+            inky.set_image(resizedimage, saturation=saturation)
+        except TypeError:
+            inky.set_image(resizedimage)
 
     inky.show()
 
