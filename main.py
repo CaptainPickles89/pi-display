@@ -39,6 +39,14 @@ def show_pihole():
     except Exception as e:
         print(f"Failed to get stock pihole data: {e}")
         return 1  # failure
+    
+def check_birthdays():
+    try:
+        subprocess.run(["python3", "birthdays.py", "./birthdays.json"])
+        return 0  # success
+    except Exception as e:
+        print(f"Failed to get stock pihole data: {e}")
+        return 1  # failure
 
 
 # Bedfordshire weather API setup (use OpenWeatherMap as an alternative source)
@@ -62,12 +70,13 @@ def display_image(image_path):
 # Main loop
 def main():
     image_files = [os.path.join(image_dir, f) for f in os.listdir(image_dir) if f.endswith(('.png', '.jpg', '.jpeg'))]
-    display_functions = [show_pihole(), lambda: display_image(random.choice(image_files)), lambda: get_stock("IGG.L"),]
+    display_functions = [lambda: show_pihole(), lambda: display_image(random.choice(image_files)), lambda: get_stock("IGG.L"),]
     
     current_index = 0
 
     while True:
-        # Check if the function is callable (i.e., not None)
+        print(f"Calling index {current_index}")
+        print(f"Display function {display_functions[current_index]}")
         if display_functions[current_index]:
            display_functions[current_index]()
         else:
@@ -77,9 +86,10 @@ def main():
         start_time = time.time()
         while time.time() - start_time < 600:  # 10 minutes
             if button_a.is_pressed:
-                current_index = (current_index + 1) % len(display_functions)
                 break
             time.sleep(0.1)  # Check button press every 100ms
+
+        current_index = (current_index + 1) % len(display_functions)
 
 if __name__ == "__main__":
     main()

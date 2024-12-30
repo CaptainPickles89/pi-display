@@ -1,0 +1,6 @@
+gpiozero==2.0.1
+inky==2.0.0
+matplotlib==3.10.0
+Pillow==11.0.0
+Requests==2.32.3
+yfinance==0.2.51

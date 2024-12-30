@@ -45,7 +45,7 @@ def check_birthdays(birthdays: dict) -> None:
             draw = ImageDraw.Draw(img)
                 
             # Font settings (update path to your font file)
-            font_path = "/usr/share/fonts/truetype/roboto/unhinted/RobotoCondensed-Medium.ttf"
+            font_path = "./resources/fonts/Roboto-Medium.ttf"
             font = ImageFont.truetype(font_path, 50)
 
             # Birthday message
@@ -67,7 +67,7 @@ def check_birthdays(birthdays: dict) -> None:
             inky.set_image(img)
             inky.show()
         else:
-            print("No birthdays today")
+            print(f"it's not {name}'s today")
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
