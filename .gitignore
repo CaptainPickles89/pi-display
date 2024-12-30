@@ -8,6 +8,7 @@ mock_inky/
 creds/google-key.json
 creds/pihole-api.txt
 creds/alphavantage-api.txt
+creds/apod-api.txt
 
 # Ignore birthday list
 birthdays.json

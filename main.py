@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import yfinance as yf
 import io
 import datetime
+from apod import display_apod
 from PIL import Image, ImageDraw, ImageFont
 from gpiozero import Button
 from inky.auto import auto
@@ -73,7 +74,7 @@ def display_image(image_path):
 # Main loop
 def main():
     image_files = [os.path.join(image_dir, f) for f in os.listdir(image_dir) if f.endswith(('.png', '.jpg', '.jpeg'))]
-    display_functions = [lambda: show_pihole(), lambda: display_image(random.choice(image_files)), lambda: get_stock("IGG.L"),]
+    display_functions = [lambda: show_pihole(), lambda: display_image(random.choice(image_files)), lambda: get_stock("IGG.L"), lambda: display_apod(),]
     
     current_index = 0
 
@@ -89,11 +90,14 @@ def main():
         start_time = time.time()
         while time.time() - start_time < 900:  # 15 minutes
             if button_a.is_pressed:
+                print("Skipping to next function")
                 break    
             elif button_b.is_pressed:
                 current_index = 0
+                print("Jumping to displaying a picture")
                 break
             elif button_d.is_pressed:
+                print("Forcing a screen clean")
                 screen_clear()
                 break
             time.sleep(0.1)  # Check button press every 100ms
