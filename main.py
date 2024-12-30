@@ -89,8 +89,11 @@ def main():
         start_time = time.time()
         while time.time() - start_time < 900:  # 15 minutes
             if button_a.is_pressed:
-                break            
+                break    
             elif button_b.is_pressed:
+                current_index = 0
+                break
+            elif button_d.is_pressed:
                 screen_clear()
                 break
             time.sleep(0.1)  # Check button press every 100ms
