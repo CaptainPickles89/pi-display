@@ -1,6 +1,6 @@
 #  [![My Skills](https://skillicons.dev/icons?i=raspberrypi,python&theme=dark)](https://skillicons.dev) Pi Display 
 
-This Python project was created to have multiple information and images cycle through on an e-ink display
+This Python project was created to have multiple information displays and images cycle through on an e-ink display
 
 ## General
 

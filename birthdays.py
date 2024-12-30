@@ -44,7 +44,7 @@ def check_birthdays(birthdays: dict) -> None:
                 warnings.filterwarnings("ignore", message="Busy Wait: Held high")
                 print(f"Happy Birthday, {name}!")
                 inky = auto()
-                img = Image.open("./resources/imgs/pihole-bg1-01.png").convert("P")  # Convert to mode "P" for Inky compatibility
+                img = Image.open("./resources/imgs/birthday-bg1-01.png").convert("P")  # Convert to mode "P" for Inky compatibility
                 draw = ImageDraw.Draw(img)
                     
                 # Font settings (update path to your font file)

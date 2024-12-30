@@ -16,7 +16,10 @@ inky_display = auto()
 inky_display.set_border(inky_display.WHITE)
 
 # Button setup
-button_a = Button(5)  # Adjust GPIO pin number if needed
+button_a = Button(5)  
+button_b = Button(6)
+button_c = Button(16)
+button_d = Button(24)
 
 # Paths
 image_dir = "/home/danny/Pictures"  # Change to your image directory
@@ -86,8 +89,12 @@ def main():
         start_time = time.time()
         while time.time() - start_time < 900:  # 15 minutes
             if button_a.is_pressed:
+                break            
+            elif button_b.is_pressed:
+                screen_clear()
                 break
             time.sleep(0.1)  # Check button press every 100ms
+                
 
         current_index = (current_index + 1) % len(display_functions)
 
