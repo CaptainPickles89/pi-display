@@ -4,7 +4,7 @@ This Python project was created to have multiple information and images cycle th
 
 ## General
 
-This script runs every 10 minutes and will loop through all the functions within the __display_function__ variable in __main.py__, if you do not want to use one of these functions then you will need to remove it from there to stop it being called
+This script runs every 15 minutes and will loop through all the functions within the __display_function__ variable in __main.py__, if you do not want to use one of these functions then you will need to remove it from there to stop it being called
 
 Each function should be modular so you can use them all running main.py or you can call just specific functions that you want to use, such as:
 ```md

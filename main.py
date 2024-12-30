@@ -6,7 +6,7 @@ import warnings
 import matplotlib.pyplot as plt
 import yfinance as yf
 import io
-from datetime import datetime
+import datetime
 from PIL import Image, ImageDraw, ImageFont
 from gpiozero import Button
 from inky.auto import auto
@@ -82,9 +82,9 @@ def main():
         else:
            print(f"Error: Function at index {current_index} is None")
         
-        # Wait for 10 minutes or button press
+        # Wait for 15 minutes or button press
         start_time = time.time()
-        while time.time() - start_time < 600:  # 10 minutes
+        while time.time() - start_time < 900:  # 15 minutes
             if button_a.is_pressed:
                 break
             time.sleep(0.1)  # Check button press every 100ms
