@@ -56,9 +56,13 @@ def display_apod():
 
     apod_image = fetch_apod()
     if apod_image:
+        print(f"NASA Image of the day displaying now!")
         # Resize image to fit the Inky display
         apod_image = apod_image.resize(inky_display.resolution)
         inky_display.set_image(apod_image)
         inky_display.show()
     else:
         print("No APOD image to display.")
+
+if __name__ == "__main__":
+    display_apod()

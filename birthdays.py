@@ -42,7 +42,7 @@ def check_birthdays(birthdays: dict) -> None:
         if today_day_month == '-'.join(birth_day_month):  # Check if today matches the birthday's day and month
             with warnings.catch_warnings():
                 warnings.filterwarnings("ignore", message="Busy Wait: Held high")
-                print(f"Happy Birthday, {name}!")
+                print(f"It looks like it's {name}'s birthday today!")
                 inky = auto()
                 img = Image.open("./resources/imgs/birthday-bg1-01.png").convert("P")  # Convert to mode "P" for Inky compatibility
                 draw = ImageDraw.Draw(img)
@@ -52,7 +52,7 @@ def check_birthdays(birthdays: dict) -> None:
                 font = ImageFont.truetype(font_path, 50)
 
                 # Birthday message
-                message = (f"It's {name}'s Birthday today!")
+                message = (f"Happy Birthday {name}!")
 
                 # Measure text size
                 text_bbox = draw.multiline_textbbox((0, 0), message, font=font)
@@ -77,4 +77,4 @@ if __name__ == "__main__":
         file_path = sys.argv[1]  # Get the file path from the command-line argument
         read_birthdays(file_path)
     else:
-        print("No image path provided!")
+        print("No Birthdays provided!")

@@ -2,6 +2,7 @@ import requests
 from PIL import Image, ImageDraw, ImageFont
 from inky.auto import auto
 
+
 def fetch_pihole_stats():
     api_url = "http://192.168.7.213/admin"
     api_key = load_api_key()

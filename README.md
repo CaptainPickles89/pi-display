@@ -4,7 +4,7 @@ This Python project was created to have multiple information displays and images
 
 ## General
 
-This script runs every 15 minutes and will loop through all the functions within the __display_function__ variable in __main.py__, if you do not want to use one of these functions then you will need to remove it from there to stop it being called
+This script runs every 15 minutes and will loop through all the functions within the __display_function__ variable in __main.py__, if you do not want to use one of these functions then you will need to remove it from there to stop it being called. If you have an e-ink with buttons pressing __Button A__ skips to the next display function
 
 Each function should be modular so you can use them all running main.py or you can call just specific functions that you want to use, such as:
 ```md
@@ -33,15 +33,19 @@ $ source eink_display_venv/bin/activate
 python3 main.py > /dev/null 2>&1 & 
 ```
 
+Any error logging is currently sent __/tmp/pi-display.log__ shoul you face any issues
+
 ## Current Features
  - [Pictures](#pictures)
  - [Stocks](#stocks)
  - [PiHole Stats](#pihole-stats)
  - [Birthdays](#birthdays)
+ - [NASA APOD](#nasa-apod)
+ - [Clear](#clear)
 
 ## Pictures
 
-This script will take images from the default location of __~/Pictures__, so put any images you want displayed in there and they will be chosen at random to be displayed
+This script will take images from the default location of __~/Pictures__, so put any images you want displayed in there and they will be chosen at random to be displayed. If you have a e-ink with buttons, pressing __Button B__ will force this to run immediatly regardless fo where the current rotation is
 
 ## Stocks
 
@@ -68,3 +72,10 @@ Add in a JSON of birthdays you want to keep track of and your display will let y
 }
 ```
 If today is someones birthday, then the display should let you know.
+
+## NASA APOD
+
+NASA APOD or API Picture Of the Day, will call the NASA API and show whatever the picture of the day is. You will need to signup for a free [NASA API here](https://api.nasa.gov/), and then add it into the __/creds__ folder as __apod-api.txt__.
+
+## Clear
+If you have an e-ink with buttons pressing __Button D__ triggers the clear function which cycles blocks of avialble colours multiple times in order to clear any potential image ghosting
