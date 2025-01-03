@@ -22,12 +22,16 @@ button_d = Button(24)
 
 # Paths
 image_dir = "/home/danny/Pictures"  # Change to your image directory
-LOG_FILE = "/tmp/pi-display.log"    # Error log location
+LOG_FILE = "./pi-display.log"    # Error log location
 
 def log_error(message):
-    # Logs error messages to specified file
-    with open(LOG_FILE, "a") as log_file:
-        log_file.write(f"{time.strftime('%d-%m-%Y %H:%M:%S')} - {message}\n")
+    try:
+        # Logs error messages to specified file
+        with open(LOG_FILE, "a") as log_file:
+            log_file.write(f"{time.strftime('%d-%m-%Y %H:%M:%S')} - {message}\n")
+            log_file.flush()
+    except Exception as e:
+        print(f"Failed to log error {e}")
 
 def get_stock(symbol):
     try:
@@ -38,16 +42,8 @@ def get_stock(symbol):
         return 0  # success
     except Exception as e:
         print(f"Failed to get stock data for {symbol}: {e}")
+        log_error(f"Failed to get stock {symbol}: {e}")
         return 1  # failure
-    
-def check_birthdays():
-    try:
-        subprocess.run(["python3", "birthdays.py", "./birthdays.json"])
-        return 0  # success
-    except Exception as e:
-        print(f"Failed to get stock pihole data: {e}")
-        return 1  # failure
-
 
 # Clear the e-ink screen 
 def screen_clear():
@@ -56,6 +52,7 @@ def screen_clear():
         return 0  # success
     except Exception as e:
         print(f"Failed to clear display: {e}")
+        log_error(f"Failed to clear display: {e}")
         return 1  # failure
 
 # Display an image
@@ -65,10 +62,12 @@ def display_image(image_path):
         subprocess.run(['python3', 'image.py', image_path])
     except Exception as e:
         print(f"Failed to display image: {e}")
+        log_error(f"Failed to display image: {e}")
 
 
 # Main loop
 def main():
+    log_error(f"Starting main loop")
     try:
         image_files = [os.path.join(image_dir, f) for f in os.listdir(image_dir) if f.endswith(('.png', '.jpg', '.jpeg'))]
         display_functions = [
