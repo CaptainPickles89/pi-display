@@ -8,7 +8,7 @@ import subprocess
 from logging.handlers import RotatingFileHandler
 from apod import display_apod
 from pihole import show_pihole_stats
-from birthdays import check_birthdays
+from birthdays import read_birthdays
 from PIL import Image, ImageDraw, ImageFont
 from gpiozero import Button
 from inky.auto import auto
@@ -91,7 +91,7 @@ def main():
             lambda: display_image(random.choice(image_files)),
             lambda: get_stock("IGG.L"),
             lambda: display_apod(),
-            lambda: check_birthdays(birthday_file),
+            lambda: read_birthdays(birthday_file),
             ]
         
         current_index = 0
