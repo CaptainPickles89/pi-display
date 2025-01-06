@@ -1,8 +1,11 @@
 import os
 import random
+import logging
 import time
+import sys
 import traceback
 import subprocess
+from logging.handlers import RotatingFileHandler
 from apod import display_apod
 from pihole import show_pihole_stats
 from birthdays import check_birthdays
@@ -22,7 +25,20 @@ button_d = Button(24)
 
 # Paths
 image_dir = "/home/danny/Pictures"  # Change to your image directory
-LOG_FILE = "./pi-display.log"    # Error log location
+LOG_FILE = "./pi-display.log"       # Error log location
+birthday_file = "./birthdays.json"  # Birthday json location
+
+# Log Rotation
+max_log_size = 5 * 1024 * 1024 # 5MB
+backup_count = 3 # Keep 3 logs
+
+handler = RotatingFileHandler(LOG_FILE, maxBytes=max_log_size, backupCount=backup_count)
+formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+handler.setFormatter(formatter)
+
+logger = logging.getLogger("display_logger")
+logger.setLevel(logging.DEBUG)
+logger.addHandler(handler)
 
 def log_error(message):
     try:
@@ -67,7 +83,7 @@ def display_image(image_path):
 
 # Main loop
 def main():
-    log_error(f"Starting main loop")
+    logger.info(f"Starting main loop")
     try:
         image_files = [os.path.join(image_dir, f) for f in os.listdir(image_dir) if f.endswith(('.png', '.jpg', '.jpeg'))]
         display_functions = [
@@ -75,7 +91,7 @@ def main():
             lambda: display_image(random.choice(image_files)),
             lambda: get_stock("IGG.L"),
             lambda: display_apod(),
-            lambda: check_birthdays(),
+            lambda: check_birthdays(birthday_file),
             ]
         
         current_index = 0
@@ -114,9 +130,17 @@ def main():
 
     except Exception as e:
         # Log the final error and re-raise it to stop the script
-        log_error(f"Fatal error in main loop: {e}")
+        logger.error(f"Fatal error in main loop: {e}", exc_info=True)
         log_error(traceback.format_exc())
+        sys.exit(1)
         raise
+
+    except KeyboardInterrupt:
+        logger.info("Process intterupted by user")
+        sys.exit(0)
+
+    finally:
+        logger.info("Process Exiting")
 
 if __name__ == "__main__":
     try:
@@ -124,3 +148,4 @@ if __name__ == "__main__":
     except Exception as e:
         log_error(f"Unhandled exception: {e}")
         log_error(traceback.format_exc())
+        logger.critical(f"Fatal Error: {e}", exc_info=True)
