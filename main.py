@@ -9,7 +9,6 @@ from logging.handlers import RotatingFileHandler
 from apod import display_apod
 from pihole import show_pihole_stats
 from birthdays import read_birthdays
-from PIL import Image, ImageDraw, ImageFont
 from gpiozero import Button
 from inky.auto import auto
 
@@ -31,11 +30,9 @@ birthday_file = "./birthdays.json"  # Birthday json location
 # Log Rotation
 max_log_size = 5 * 1024 * 1024 # 5MB
 backup_count = 3 # Keep 3 logs
-
 handler = RotatingFileHandler(LOG_FILE, maxBytes=max_log_size, backupCount=backup_count)
 formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 handler.setFormatter(formatter)
-
 logger = logging.getLogger("display_logger")
 logger.setLevel(logging.DEBUG)
 logger.addHandler(handler)

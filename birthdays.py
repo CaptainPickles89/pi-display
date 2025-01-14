@@ -22,12 +22,8 @@ def read_birthdays(file_path):
         return {}
 
 def check_birthdays(birthdays: dict) -> None:
-    """
-    Check if today is anyone's birthday from the given list.
-    
-    Args:
-        birthdays (dict): A dictionary with names as keys and birthdates as values in 'DD-MM-YYYY' format.
-    """
+
+    # Check if today is anyone's birthday    
     today = datetime.today()
     today_day_month = today.strftime('%d-%m')  # Get current day and month in 'DD-MM' format
     
@@ -45,7 +41,7 @@ def check_birthdays(birthdays: dict) -> None:
                 font_path = "./resources/fonts/Roboto-Medium.ttf"
                 font = ImageFont.truetype(font_path, 50)
 
-                # Birthday message
+                # Birthday message for the inky
                 message = (f"Happy Birthday {name}!")
 
                 # Measure text size
@@ -68,7 +64,8 @@ def check_birthdays(birthdays: dict) -> None:
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        file_path = sys.argv[1]  # Get the file path from the command-line argument
+        # Get the file path from the command-line argument
+        file_path = sys.argv[1]
         read_birthdays(file_path)
     else:
         print("No Birthdays provided!")

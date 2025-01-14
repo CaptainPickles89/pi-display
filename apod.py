@@ -1,5 +1,5 @@
 import requests
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 from io import BytesIO
 from inky.auto import auto
 
@@ -19,9 +19,7 @@ def fetch_apod():
     # Grab API Key
     api_key = load_api_key()
 
-    """
-    Fetch the Astronomy Picture of the Day (APOD) from NASA API.
-    """
+    # Fetch the Astronomy Picture of the Day (APOD) from NASA API.
     url = f"https://api.nasa.gov/planetary/apod?api_key={api_key}"
     
     try:
@@ -36,29 +34,38 @@ def fetch_apod():
         
         # Fetch the image
         image_url = data["url"]
+        image_title = data["title"]
         image_response = requests.get(image_url)
         image_response.raise_for_status()
         
         # Open the image
         image = Image.open(BytesIO(image_response.content))
-        return image
+        return image, image_title
 
     except requests.exceptions.RequestException as e:
         print(f"Failed to fetch APOD: {e}")
         return None
 
 def display_apod():
-    """
-    Fetch and display the APOD image on the Inky display.
-    """
+
+    # Fetch and display the APOD image on the Inky display.
+
     inky_display = auto()
     inky_display.set_border(inky_display.BLACK)
 
-    apod_image = fetch_apod()
+    apod_image, apod_title = fetch_apod()
     if apod_image:
         print(f"NASA Image of the day displaying now!")
         # Resize image to fit the Inky display
         apod_image = apod_image.resize(inky_display.resolution)
+        # Font settings (update path to your font file)
+        font_path = "./resources/fonts/Roboto-Medium.ttf"
+        title_font = ImageFont.truetype(font_path, 15)
+        text_coords = (75, 410)
+        apod_image.text(text_coords, apod_title, font=title_font, fill="white", stroke_width=2, stroke_fill="black")
+        # Brighten the image slightly
+        enhancer = ImageEnhance.Brightness(apod_image)
+        apod_image = enhancer.enhance(1.5)
         inky_display.set_image(apod_image)
         inky_display.show()
     else:

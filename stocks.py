@@ -37,7 +37,7 @@ def fetch_and_display_stock(symbol):
         plt.legend()
 
         # Save the plot as an image
-        graph_path = "/tmp/stock_graph.png"  # Temporary path for the graph
+        graph_path = "/tmp/stock_graph.png"  # Save the image in /tmp
         plt.savefig(graph_path, bbox_inches="tight")
         plt.close()
 
