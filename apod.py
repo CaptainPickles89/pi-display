@@ -68,7 +68,7 @@ def display_apod():
         text_width, text_height = draw.textsize(apod_title, font=title_font)
         x_position = display_width - text_width - 10  # 10px padding from the right
         y_position = display_height - text_height - 10  # 10px padding from the bottom
-        draw.text((x_position, y_position), apod_title, font=title_font, fill="black", stroke_width=2, stroke_fill="white")
+        draw.text((x_position, y_position), apod_title, font=title_font, fill="white", stroke_width=2, stroke_fill="black")
         # Brighten the image slightly
         enhancer = ImageEnhance.Brightness(apod_image)
         apod_image = enhancer.enhance(1.5)

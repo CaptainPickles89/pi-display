@@ -80,3 +80,8 @@ NASA APOD or API Picture Of the Day, will call the NASA API and show whatever th
 
 ## Clear
 If you have an e-ink with buttons pressing __Button D__ triggers the clear function which cycles blocks of avialble colours multiple times in order to clear any potential image ghosting
+
+## Credits
+
+This project uses the **Roboto** font, which is licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).  
+Roboto is a trademark of Google, and the font is made available by [Google Fonts](https://fonts.google.com/).
