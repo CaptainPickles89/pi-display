@@ -5,7 +5,7 @@ This Python project was created to have multiple information displays and images
 
 ## General
 
-This script runs every 15 minutes and will loop through all the functions within the __display_function__ variable in __main.py__, if you do not want to use one of these functions then you will need to remove it from there to stop it being called. If you have an e-ink with buttons pressing __Button A__ skips to the next display function
+This script runs every 20 minutes and will loop through all the functions within the __display_function__ variable in __main.py__, if you do not want to use one of these functions then you will need to remove it from there to stop it being called. If you have an e-ink with buttons pressing __Button A__ skips to the next display function
 
 Each function should be modular so you can use them all running main.py or you can call just specific functions that you want to use, such as:
 ```md
@@ -34,7 +34,7 @@ $ source eink_display_venv/bin/activate
 python3 main.py > /dev/null 2>&1 & 
 ```
 
-Any error logging is currently sent __/tmp/pi-display.log__ shoul you face any issues
+Any error logging is currently sent __/tmp/pi-display.log__ should you face any issues
 
 ## Current Features
  - [Pictures](#pictures)

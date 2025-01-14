@@ -92,9 +92,9 @@ def main():
                     print(f"Error: Function at index {current_index} is None")
                     log_error(f"Error: Function at index {current_index} is None")
                 
-                # Wait for 15 minutes or button press
+                # Wait for 20 minutes or button press
                 start_time = time.time()
-                while time.time() - start_time < 900:  # 15 minutes
+                while time.time() - start_time < 1200:  # 20 minutes
                     if button_a.is_pressed:
                         print("Skipping to next function")
                         break    

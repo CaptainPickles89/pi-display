@@ -2,7 +2,6 @@
 
 import sys
 import warnings
-import sys
 
 from PIL import Image
 
