@@ -56,7 +56,7 @@ lambda: get_stock("IGG.L")
 ```
 Example Output:
 
-![IGG.L Stock Example](/docs/stock_graph.png)
+![IGG.L Stock Example](/docs/stock_example.png)
 
 ## Pihole Stats
 
