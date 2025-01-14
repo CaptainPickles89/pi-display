@@ -10,6 +10,7 @@ from apod import display_apod
 from stocks import fetch_and_display_stock
 from pihole import show_pihole_stats
 from birthdays import read_birthdays
+from date_display import get_date
 from gpiozero import Button
 from inky.auto import auto
 
@@ -78,6 +79,7 @@ def main():
             lambda: fetch_and_display_stock("IGG.L"),
             lambda: display_apod(),
             lambda: read_birthdays(birthday_file),
+            lambda: get_date(),
             ]
         
         current_index = 0

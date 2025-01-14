@@ -43,6 +43,7 @@ Any error logging is currently sent __/tmp/pi-display.log__ should you face any 
  - [Birthdays](#birthdays)
  - [NASA APOD](#nasa-apod)
  - [Clear](#clear)
+ - [Date](#date)
 
 ## Pictures
 
@@ -88,6 +89,13 @@ Example Output:
 ## Clear
 If you have an e-ink with buttons pressing __Button D__ triggers the clear function which cycles blocks of avialble colours multiple times in order to clear any potential image ghosting
 
+## Date
+This function pulls todays date and displays the day, date and month
+
+Example Output:
+
+![Date Example](/docs/date_example.png)
+
 ## Credits
 
 This project uses the **Roboto** font, which is licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).  
@@ -99,5 +107,7 @@ This project also uses the following libraries and resources:
 - [yfinance](https://pypi.org/project/yfinance/)
 - [Pillow](https://pillow.readthedocs.io/)
 - And many others...
+
+Special thanks to [ChatGPT](https://chatgpt.com) by OpenAI for assistance with coding and design ideas.
 
 Please refer to the `LICENSE` file for more detailed license information.

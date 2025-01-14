@@ -20,8 +20,8 @@ def get_date():
 
     # Font settings (update path to your font file)
     font_path = "./resources/fonts/Roboto-Medium.ttf"
-    num_font = ImageFont.truetype(font_path, 60)
-    text_font = ImageFont.truetype(font_path, 40)
+    num_font = ImageFont.truetype(font_path, 90)
+    text_font = ImageFont.truetype(font_path, 50)
 
     # Define Displayed Lines
     line1 = f"{date_day}"
@@ -29,12 +29,12 @@ def get_date():
     line3 = f"{date_month}"
 
     # Measure the width and height of each line
-    text_spacing = 10  # Spacing between lines
+    text_spacing = 15  # Spacing between lines
 
     # Draw first line (centered horizontally)
     text_width, text_height = draw.textsize(line1, font=text_font)
     x_position = (display_width - text_width) // 2
-    y_position = 50
+    y_position = 90
     draw.text((x_position, y_position), line1, font=text_font, fill="black")
 
     # Draw second line with larger font (centered horizontally)
