@@ -34,7 +34,7 @@ def check_birthdays(birthdays: dict) -> None:
                 warnings.filterwarnings("ignore", message="Busy Wait: Held high")
                 print(f"It looks like it's {name}'s birthday today!")
                 inky = auto()
-                img = Image.open("./resources/imgs/birthday-bg1-01.png").convert("P")  # Convert to mode "P" for Inky compatibility
+                img = Image.open("./resources/imgs/birthday-bg1-01.png")
                 draw = ImageDraw.Draw(img)
                     
                 # Font settings (update path to your font file)

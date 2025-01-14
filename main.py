@@ -7,6 +7,7 @@ import traceback
 import subprocess
 from logging.handlers import RotatingFileHandler
 from apod import display_apod
+from stocks import fetch_and_display_stock
 from pihole import show_pihole_stats
 from birthdays import read_birthdays
 from gpiozero import Button
@@ -46,18 +47,6 @@ def log_error(message):
     except Exception as e:
         print(f"Failed to log error {e}")
 
-def get_stock(symbol):
-    try:
-        subprocess.run(['python3', 'stocks.py', symbol])
-        image_path="/tmp/stock_graph.png"
-        print(f"Displaying stock graph from {image_path}")
-        display_image(image_path)
-        return 0  # success
-    except Exception as e:
-        print(f"Failed to get stock data for {symbol}: {e}")
-        log_error(f"Failed to get stock {symbol}: {e}")
-        return 1  # failure
-
 # Clear the e-ink screen 
 def screen_clear():
     try:
@@ -86,7 +75,7 @@ def main():
         display_functions = [
             lambda: show_pihole_stats(),
             lambda: display_image(random.choice(image_files)),
-            lambda: get_stock("IGG.L"),
+            lambda: fetch_and_display_stock("IGG.L"),
             lambda: display_apod(),
             lambda: read_birthdays(birthday_file),
             ]

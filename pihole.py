@@ -2,7 +2,6 @@ import requests
 from PIL import Image, ImageDraw, ImageFont
 from inky.auto import auto
 
-
 def fetch_pihole_stats():
     api_url = "http://192.168.7.213/admin"
     api_key = load_api_key()
@@ -50,7 +49,7 @@ def load_api_key():
 def display_pihole_stats(stats):
     # Prepare the display
     inky = auto()
-    img = Image.open("./resources/imgs/pihole-bg1-01.png").convert("P")  # Convert to mode "P" for Inky compatibility
+    img = Image.open("./resources/imgs/pihole-bg1-01.png")
     draw = ImageDraw.Draw(img)
 
     # Font settings (update path to your font file)
@@ -76,9 +75,6 @@ def display_pihole_stats(stats):
 
     # Draw the text on the image
     draw.multiline_text((x_position, y_position), stats_text, font=font, fill=0)  # Black text
-
-    # Debug: Save the image to check the output
-    img.save("/tmp/debug_output.png")
 
     # Show on the Inky
     inky.set_image(img)

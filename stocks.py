@@ -2,6 +2,8 @@ import sys
 import yfinance as yf
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+from PIL import Image, ImageDraw, ImageFont
+from inky.auto import auto
 
 def fetch_and_display_stock(symbol):
     # Fetch stock data
@@ -43,10 +45,22 @@ def fetch_and_display_stock(symbol):
 
         # Display the graph on the Inky
         print(graph_path)
-        return graph_path
+        display_stock_graph(graph_path)
     except Exception as e:
         print(f"Error in stock script: {e}")
         sys.exit(1)
+
+def display_stock_graph(graph_path):
+    # Prepare the display
+    inky = auto()    
+    saturation = 0.5
+    img = Image.open(graph_path)
+    resizedimage = img.resize(inky.resolution)
+    try:
+        inky.set_image(resizedimage, saturation=saturation)
+    except TypeError:
+        inky.set_image(resizedimage)
+    inky.show()
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
