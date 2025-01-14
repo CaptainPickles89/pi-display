@@ -6,6 +6,7 @@ This is a list of features I hope to add if I get chance
  - [ ] Intergrate with Google API for calendar events
  - [ ] Intergrate with Home Assistant
  - [ ] Make birthdays.py handle 2 on the same day
+ - [ ] Add a general date display
 
 ## In Progress
  - [ ] Add error logging to file

@@ -51,7 +51,7 @@ This script will take images from the default location of __~/Pictures__, so put
 ## Stocks
 
 This will generate a close price graph of the last 3 months for a given stock (via Yahoo finance), change the stock you wish to see by changing the stock symbol under display_functions in main.py:
-```md
+```python
 lambda: get_stock("IGG.L")
 ```
 Example Output:
@@ -61,6 +61,9 @@ Example Output:
 ## Pihole Stats
 
 Uses the pihole API to pull back daily stats for ads blocked, DNS queries made and percentage of blocked requests. In order to use this change the __api_url__ within __pihole.py__ to point it to your own instance and ensure you have an api key stored in __/creds/pihole-api.txt__
+
+Example Output:
+![Pihole Stats](/docs/pihole_example.png)
 
 ## Birthdays
 
@@ -76,7 +79,11 @@ If today is someones birthday, then the display should let you know.
 
 ## NASA APOD
 
-NASA APOD or API Picture Of the Day, will call the NASA API and show whatever the picture of the day is. You will need to signup for a free [NASA API here](https://api.nasa.gov/), and then add it into the __/creds__ folder as __apod-api.txt__.
+NASA APOD or Astronomy Picture Of the Day, will call the NASA API and show whatever the picture of the day is with its title. You will need to signup for a free [NASA API here](https://api.nasa.gov/), and then add it into the __/creds__ folder as __apod-api.txt__.
+
+Example Output:
+
+![APOD Example](/docs/apod_example.png)
 
 ## Clear
 If you have an e-ink with buttons pressing __Button D__ triggers the clear function which cycles blocks of avialble colours multiple times in order to clear any potential image ghosting
@@ -85,3 +92,12 @@ If you have an e-ink with buttons pressing __Button D__ triggers the clear funct
 
 This project uses the **Roboto** font, which is licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).  
 Roboto is a trademark of Google, and the font is made available by [Google Fonts](https://fonts.google.com/).
+
+This project also uses the following libraries and resources:
+
+- [Inky Impression](https://github.com/pimoroni/inky) by Pimoroni
+- [yfinance](https://pypi.org/project/yfinance/)
+- [Pillow](https://pillow.readthedocs.io/)
+- And many others...
+
+Please refer to the `LICENSE` file for more detailed license information.
