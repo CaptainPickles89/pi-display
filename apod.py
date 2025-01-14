@@ -56,14 +56,19 @@ def display_apod():
     apod_image, apod_title = fetch_apod()
     if apod_image:
         print(f"NASA Image of the day displaying now!")
+        # Get the resolution of the Inky display dynamically
+        display_width, display_height = apod_image.size  # Assuming image is already resized to fit display
         # Resize image to fit the Inky display
         apod_image = apod_image.resize(inky_display.resolution)
         draw = ImageDraw.Draw(apod_image)
         # Font settings (update path to your font file)
         font_path = "./resources/fonts/Roboto-Medium.ttf"
-        title_font = ImageFont.truetype(font_path, 15)
-        text_coords = (75, 410)
-        draw.text(text_coords, apod_title, font=title_font, fill="white", stroke_width=2, stroke_fill="black")
+        title_font = ImageFont.truetype(font_path, 20)
+        # Get text size to calculate bottom-right position
+        text_width, text_height = draw.textsize(apod_title, font=title_font)
+        x_position = display_width - text_width - 10  # 10px padding from the right
+        y_position = display_height - text_height - 10  # 10px padding from the bottom
+        draw.text((x_position, y_position), apod_title, font=title_font, fill="black", stroke_width=2, stroke_fill="white")
         # Brighten the image slightly
         enhancer = ImageEnhance.Brightness(apod_image)
         apod_image = enhancer.enhance(1.5)
