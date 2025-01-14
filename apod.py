@@ -62,8 +62,8 @@ def display_apod():
         display_width, display_height = apod_image.size  # Assuming image is already resized to fit display
         draw = ImageDraw.Draw(apod_image)
         # Font settings (update path to your font file)
-        font_path = "./resources/fonts/Roboto-Medium.ttf"
-        title_font = ImageFont.truetype(font_path, 20)
+        font_path = "./resources/fonts/Roboto-Light.ttf"
+        title_font = ImageFont.truetype(font_path, 25)
         # Get text size to calculate bottom-right position
         text_width, text_height = draw.textsize(apod_title, font=title_font)
         x_position = display_width - text_width - 10  # 10px padding from the right
