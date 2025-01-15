@@ -47,7 +47,7 @@ Any error logging is currently sent __/tmp/pi-display.log__ should you face any 
 
 ## Pictures
 
-This script will take images from the default location of __~/Pictures__, so put any images you want displayed in there and they will be chosen at random to be displayed. If you have a e-ink with buttons, pressing __Button B__ will force this to run immediatly regardless fo where the current rotation is
+This script will take images from the location of __image_dir__ set within the __main.py__ script, so put any images you want displayed in there and they will be chosen at random to be displayed. If you have a e-ink with buttons, pressing __Button B__ will force this to run immediatly regardless fo where the current rotation is
 
 ## Stocks
 
