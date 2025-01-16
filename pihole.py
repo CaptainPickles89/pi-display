@@ -21,6 +21,7 @@ def fetch_pihole_stats():
         ads_blocked_today = data.get("ads_blocked_today", "N/A")
         dns_queries_today = data.get("dns_queries_today", "N/A")
         percentage_blocked = data.get("ads_percentage_today", "N/A")
+        unique_clients = data.get("unique_clients", "N/A")
 
         print(f"Pihole stats returned {percentage_blocked}% blocked so far today")
 
@@ -28,6 +29,7 @@ def fetch_pihole_stats():
             "ads_blocked": ads_blocked_today,
             "dns_queries": dns_queries_today,
             "percentage_blocked": percentage_blocked,
+            "unique_clients": unique_clients,
         }
 
     except Exception as e:
@@ -54,10 +56,11 @@ def display_pihole_stats(stats):
 
     # Font settings (update path to your font file)
     font_path = "./resources/fonts/Roboto-Medium.ttf"
-    font = ImageFont.truetype(font_path, 50)
+    font = ImageFont.truetype(font_path, 45)
 
     # Format the stats into a single block of text
     stats_text = (
+        f"Unique Clients: {stats['unique_clients']}\n"
         f"Ads Blocked: {stats['ads_blocked']}\n"
         f"DNS Queries: {stats['dns_queries']}\n"
         f"Blocked: {stats['percentage_blocked']}%"
@@ -74,7 +77,7 @@ def display_pihole_stats(stats):
     y_position = (image_height - text_height) // 2
 
     # Draw the text on the image
-    draw.multiline_text((x_position, y_position), stats_text, font=font, fill=0)  # Black text
+    draw.multiline_text((x_position, y_position), stats_text, font=font, align='center', fill=0)  # Black text
 
     # Show on the Inky
     inky.set_image(img)
