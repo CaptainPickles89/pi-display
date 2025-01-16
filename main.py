@@ -9,7 +9,7 @@ from logging.handlers import RotatingFileHandler
 from apod import display_apod
 from stocks import fetch_and_display_stock
 from pihole import show_pihole_stats
-from birthdays import read_birthdays
+from birthdays import check_birthdays
 from date_display import get_date
 from gpiozero import Button
 from inky.auto import auto
@@ -27,7 +27,6 @@ button_d = Button(24)
 # Paths
 image_dir = "/home/danny/Pictures"  # Change to your image directory
 LOG_FILE = "./pi-display.log"       # Error log location
-birthday_file = "./birthdays.json"  # Birthday json location
 
 # Log Rotation
 max_log_size = 5 * 1024 * 1024 # 5MB
@@ -78,7 +77,7 @@ def main():
             lambda: display_image(random.choice(image_files)),
             lambda: fetch_and_display_stock("IGG.L"),
             lambda: display_apod(),
-            lambda: read_birthdays(birthday_file),
+            lambda: check_birthdays(),
             lambda: get_date(),
             ]
         
