@@ -40,7 +40,8 @@ def check_birthdays():
         font = ImageFont.truetype(font_path, 50)
 
         # Birthday message for the inky
-        message = birthday_matches
+        names = "\n".join(birthday_matches)
+        message = f"Birthdays Today!\n{names}"
 
         # Measure text size
         text_bbox = draw.multiline_textbbox((0, 0), message, font=font)
