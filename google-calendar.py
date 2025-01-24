@@ -92,11 +92,13 @@ def get_calendar_events():
     return events
 
 def display_events():
+    message = []
     events = get_calendar_events()
     for event in events:
         start = event["start"].get("dateTime", event["start"].get("date"))
+        event_summary = f"{start} - {event['summary']}"
         print(f"{start} - {event['summary']}")
-        
+        message.append(event_summary)        
 
     try:
         # Prepare the display
@@ -105,14 +107,14 @@ def display_events():
         draw = ImageDraw.Draw(img)
 
         # Set the message
-        message = "\n".join(events)
+        final_message = "\n".join(message)
 
         # Font settings (update path to your font file)
         font_path = "./resources/fonts/Roboto-Medium.ttf"
         font = ImageFont.truetype(font_path, 45)
 
         # Measure text size
-        text_bbox = draw.multiline_textbbox((0, 0), message, font=font)
+        text_bbox = draw.multiline_textbbox((0, 0), final_message, font=font)
         text_width = text_bbox[2] - text_bbox[0]
         text_height = text_bbox[3] - text_bbox[1]
 
@@ -122,7 +124,7 @@ def display_events():
         y_position = (image_height - text_height) // 2
 
         # Draw the text on the image
-        draw.multiline_text((x_position, y_position), message, font=font, align='center', fill=0)  # Black text
+        draw.multiline_text((x_position, y_position), final_message, font=font, align='center', fill=0)  # Black text
         # Show on the Inky
         inky.set_image(img)
         inky.show()
