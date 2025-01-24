@@ -26,8 +26,20 @@ def get_authenticated_service():
                 creds = None
         if not creds:
             # Start the full authorization flow if no refresh token or creds invalid
-            flow = InstalledAppFlow.from_client_secrets_file("./creds/client_secret.json", SCOPES)
-            creds = flow.run_local_server(port=0)
+            flow = InstalledAppFlow.from_client_secrets_file("./creds/client_secret.json", SCOPES, redirect_uri="urn:ietf:wg:oauth:2.0:oob")
+            # Get the authorization URL
+            auth_url, _ = flow.authorization_url(prompt='consent')
+
+            print("Please go to this URL and authorize the application: ", auth_url)
+
+            # Ask the user to enter the authorization code
+            auth_code = input("Enter the authorization code: ")
+
+            # Fetch the token using the authorization code
+            flow.fetch_token(authorization_response=f'{auth_url}&code={auth_code}')
+
+            # Now you can use the credentials
+            creds = flow.credentials
 
         # Save the credentials for the next run
         with open("./creds/token.json", "w") as token_file:
