@@ -95,9 +95,18 @@ def display_events():
     message = []
     events = get_calendar_events()
     for event in events:
-        start = event["start"].get("dateTime", event["start"].get("date"))
-        event_summary = f"{start} - {event['summary']}"
-        print(f"{start} - {event['summary']}")
+        raw_start = event["start"].get("dateTime", event["start"].get("date"))
+        try:
+            # Parse the raw_start string into a datetime object
+            parsed_start = datetime.strptime(raw_start, "%Y-%m-%dT%H:%M:%SZ")  # For dateTime format
+            formatted_start = parsed_start.strftime("%d-%b %H:%M")
+        except ValueError:
+            # Handle cases where the start date doesn't include time (e.g., "2025-01-24")
+            parsed_start = datetime.strptime(raw_start, "%Y-%m-%d")  # For date format
+            formatted_start = parsed_start.strftime("%d-%b")
+    
+        event_summary = f"{formatted_start} - {event['summary']}"
+        print(f"{formatted_start} - {event['summary']}")
         message.append(event_summary)        
 
     try:
@@ -111,7 +120,7 @@ def display_events():
 
         # Font settings (update path to your font file)
         font_path = "./resources/fonts/Roboto-Medium.ttf"
-        font = ImageFont.truetype(font_path, 45)
+        font = ImageFont.truetype(font_path, 25)
 
         # Measure text size
         text_bbox = draw.multiline_textbbox((0, 0), final_message, font=font)
