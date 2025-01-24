@@ -73,7 +73,7 @@ def get_calendar_events():
             events_result = service.events().list(
                 calendarId=calendar_id,
                 timeMin=now,
-                maxResults=10,
+                maxResults=5,
                 singleEvents=True,
                 orderBy="startTime"
             ).execute()
@@ -105,14 +105,14 @@ def display_events():
             parsed_start = dt.datetime.strptime(raw_start, "%Y-%m-%d")  # For date format
             formatted_start = parsed_start.strftime("%d-%b")
     
-        event_summary = f"{formatted_start} - {event['summary']}"
+        event_summary = f"{formatted_start} \n {event['summary']}"
         print(f"{formatted_start} - {event['summary']}")
         message.append(event_summary)        
 
     try:
         # Prepare the display
         inky = auto()
-        img = Image.open("./resources/imgs/pihole-bg1-01.png")
+        img = Image.open("./resources/imgs/birthday-bg1-01.png")
         draw = ImageDraw.Draw(img)
 
         # Set the message
