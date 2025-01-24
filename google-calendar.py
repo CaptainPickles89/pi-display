@@ -1,5 +1,5 @@
 from __future__ import print_function
-import datetime
+import datetime as dt
 import os.path
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -50,7 +50,7 @@ def get_authenticated_service():
 def get_calendar_events():
     # Load credentials & build the service
     service = get_authenticated_service()
-    now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    now = dt.datetime.now(dt.timezone.utc).isoformat()
     
     # Get all calendar IDs
     all_calendars = service.calendarList().list().execute()
@@ -98,11 +98,11 @@ def display_events():
         raw_start = event["start"].get("dateTime", event["start"].get("date"))
         try:
             # Parse the raw_start string into a datetime object
-            parsed_start = datetime.strptime(raw_start, "%Y-%m-%dT%H:%M:%SZ")  # For dateTime format
+            parsed_start = dt.datetime.strptime(raw_start, "%Y-%m-%dT%H:%M:%SZ")  # For dateTime format
             formatted_start = parsed_start.strftime("%d-%b %H:%M")
         except ValueError:
             # Handle cases where the start date doesn't include time (e.g., "2025-01-24")
-            parsed_start = datetime.strptime(raw_start, "%Y-%m-%d")  # For date format
+            parsed_start = dt.datetime.strptime(raw_start, "%Y-%m-%d")  # For date format
             formatted_start = parsed_start.strftime("%d-%b")
     
         event_summary = f"{formatted_start} - {event['summary']}"
