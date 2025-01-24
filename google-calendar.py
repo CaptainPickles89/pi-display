@@ -104,7 +104,7 @@ def display_events():
         draw = ImageDraw.Draw(img)
 
         # Set the message
-        message = "\n".join(events)
+        message = "\n".join(f"{key}: {value}" for key, value in events.items())
 
         # Font settings (update path to your font file)
         font_path = "./resources/fonts/Roboto-Medium.ttf"
