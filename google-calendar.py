@@ -96,6 +96,7 @@ def display_events():
     for event in events:
         start = event["start"].get("dateTime", event["start"].get("date"))
         print(f"{start} - {event['summary']}")
+        
 
     try:
         # Prepare the display
@@ -104,7 +105,7 @@ def display_events():
         draw = ImageDraw.Draw(img)
 
         # Set the message
-        message = "\n".join(f"{key}: {value}" for key, value in events.items())
+        message = "\n".join(events)
 
         # Font settings (update path to your font file)
         font_path = "./resources/fonts/Roboto-Medium.ttf"
