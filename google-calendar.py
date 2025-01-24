@@ -91,18 +91,11 @@ def get_calendar_events():
 
     return events
 
-# Fetch and print calendar events
-events = get_calendar_events()
-print(f"----------------------")
-print(f"Getting events now")
-print(f"----------------------")
-for event in events:
-    start = event["start"].get("dateTime", event["start"].get("date"))
-    calendar_id = event.get("calendarId", "Unknown")
-    print(f"{start} - {event['summary']} (Calendar ID: {calendar_id})")
-
 def display_events():
     events = get_calendar_events()
+    for event in events:
+        start = event["start"].get("dateTime", event["start"].get("date"))
+        print(f"{start} - {event['summary']}")
 
     try:
         # Prepare the display
