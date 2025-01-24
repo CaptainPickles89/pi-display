@@ -103,12 +103,15 @@ def display_events():
         img = Image.open("./resources/imgs/pihole-bg1-01.png")
         draw = ImageDraw.Draw(img)
 
+        # Set the message
+        message = "\n".join(events)
+
         # Font settings (update path to your font file)
         font_path = "./resources/fonts/Roboto-Medium.ttf"
         font = ImageFont.truetype(font_path, 45)
 
         # Measure text size
-        text_bbox = draw.multiline_textbbox((0, 0), events, font=font)
+        text_bbox = draw.multiline_textbbox((0, 0), message, font=font)
         text_width = text_bbox[2] - text_bbox[0]
         text_height = text_bbox[3] - text_bbox[1]
 
@@ -118,7 +121,7 @@ def display_events():
         y_position = (image_height - text_height) // 2
 
         # Draw the text on the image
-        draw.multiline_text((x_position, y_position), events, font=font, align='center', fill=0)  # Black text
+        draw.multiline_text((x_position, y_position), message, font=font, align='center', fill=0)  # Black text
         # Show on the Inky
         inky.set_image(img)
         inky.show()
