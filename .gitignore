@@ -9,6 +9,11 @@ creds/google-key.json
 creds/pihole-api.txt
 creds/alphavantage-api.txt
 creds/apod-api.txt
+creds/client_secret.json
+creds/token.json
 
 # Ignore birthday list
 birthdays.json
+
+# Ignore Mike's File
+mike-test.py
