@@ -1,6 +1,9 @@
 from __future__ import print_function
 import datetime as dt
 import os.path
+import threading
+import os
+import sys
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -32,8 +35,24 @@ def get_authenticated_service():
 
             print("Please go to this URL and authorize the application: ", auth_url)
 
-            # Ask the user to enter the authorization code
-            auth_code = input("Enter the authorization code: ")
+            # Input with timeout mechanism
+            auth_code = None
+            timeout = 60  # Set your desired timeout in seconds
+
+            def get_user_input():
+                nonlocal auth_code
+                try:
+                    auth_code = input("Enter the authorization code: ")
+                except Exception as e:
+                    print(f"Error during input: {e}")
+            
+            input_thread = threading.Thread(target=get_user_input)
+            input_thread.start()
+            input_thread.join(timeout=timeout)
+
+            if auth_code is None:
+                print("\nAuthentication timed out. Please try again.")
+                return None
 
             # Fetch the token using the authorization code
             flow.fetch_token(authorization_response=f'{auth_url}&code={auth_code}')
@@ -51,6 +70,11 @@ def get_calendar_events():
     # Load credentials & build the service
     service = get_authenticated_service()
     now = dt.datetime.now(dt.timezone.utc).isoformat()
+
+    if not service:
+        print(f"Failed to authenticate with Google")
+        display_failure()
+
     
     # Get all calendar IDs
     all_calendars = service.calendarList().list().execute()
@@ -141,6 +165,16 @@ def display_events():
     except Exception as e:
         print(f"Error Displaying Events: {e}")
         return None
+    
+def display_failure():
+    # Prepare the display
+    inky = auto()
+    img = Image.open("./resources/imgs/birthday-bg1-01.png")
+    
+    # Show on the Inky
+    inky.set_image(img)
+    inky.show()
+    return 0
 
 if __name__ == "__main__":
     display_events()
