@@ -30,7 +30,7 @@ def fetch_pihole_stats(api_url, password):
         return None
 
 def load_password():
-    password_path = './creds/pihole-password.txt'
+    password_path = './creds/pihole-api.txt'
     try:
         with open(password_path, 'r') as f:
             return f.read().strip()
