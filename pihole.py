@@ -3,7 +3,7 @@ from PIL import Image, ImageDraw, ImageFont
 from inky.auto import auto
 
 def authenticate_pihole(api_url, password):
-    auth_url = f"{api_url}/api/auth"
+    auth_url = f"{api_url}/api"
     response = requests.post(auth_url, json={"password": password})
     response.raise_for_status()
     return response.json().get("SID")
