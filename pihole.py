@@ -3,7 +3,7 @@ from PIL import Image, ImageDraw, ImageFont
 from inky.auto import auto
 
 def authenticate_pihole(api_url, password):
-    auth_url = f"{api_url}/api"
+    auth_url = f"{api_url}/auth"
     response = requests.post(auth_url, json={"password": password})
     response.raise_for_status()
     return response.json().get("SID")
@@ -67,7 +67,7 @@ def display_pihole_stats(stats):
     inky.show()
 
 def show_pihole_stats():
-    api_url = "http://192.168.7.213/admin"
+    api_url = "http://192.168.7.213/api"
     password = load_password()
 
     if not password:
