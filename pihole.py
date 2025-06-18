@@ -56,6 +56,7 @@ def display_pihole_stats(stats):
         f"Unique Clients: {stats['unique_clients']}\n"
         f"Ads Blocked: {stats['ads_blocked']}\n"
         f"DNS Queries: {stats['dns_queries']}\n"
+        f"Domains Blocked: {stats['domains_blocked']}"
         f"Blocked: {stats['percentage_blocked']}%"
     )
 
