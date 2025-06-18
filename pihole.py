@@ -24,9 +24,13 @@ def fetch_pihole_stats(api_url, password):
         return {
             "ads_blocked": data.get("queries", {}).get("blocked", "N/A"),
             "dns_queries": data.get("queries", {}).get("total", "N/A"),
-            "percentage_blocked": round(data.get("queries", {}).get("percent_blocked", 0), 2),
+            "percentage_blocked": round(
+                data.get("queries", {}).get("percent_blocked", 0), 2
+            ),
             "unique_clients": data.get("clients", {}).get("active", "N/A"),
-            "domains_blocked": data.get("gravity", {}).get("domains_being_blocked", "N/A"),
+            "domains_blocked": data.get("gravity", {}).get(
+                "domains_being_blocked", "N/A"
+            ),
         }
 
     except Exception as e:
@@ -56,7 +60,7 @@ def display_pihole_stats(stats):
         f"Unique Clients: {stats['unique_clients']}\n"
         f"Ads Blocked: {stats['ads_blocked']}\n"
         f"DNS Queries: {stats['dns_queries']}\n"
-        f"Domains Blocked: {stats['domains_blocked']}"
+        f"Domains Blocked: {stats['domains_blocked']}\n"
         f"Blocked: {stats['percentage_blocked']}%"
     )
 
