@@ -8,12 +8,14 @@ from PIL import Image
 
 from inky.auto import auto
 
-print("""Inky pHAT: Clean
+print(
+    """Inky pHAT: Clean
 
 Displays solid blocks of red, black, and white to clean the Inky pHAT
 display of any ghosting.
 
-""")
+"""
+)
 
 inky_display = auto(ask_user=True, verbose=True)
 

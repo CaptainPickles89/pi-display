@@ -19,24 +19,25 @@ inky_display = auto()
 inky_display.set_border(inky_display.WHITE)
 
 # Button setup
-button_a = Button(5)  
+button_a = Button(5)
 button_b = Button(6)
 button_c = Button(16)
 button_d = Button(24)
 
 # Paths
 image_dir = "/home/danny/Pictures"  # Change to your image directory
-LOG_FILE = "./pi-display.log"       # Error log location
+LOG_FILE = "./pi-display.log"  # Error log location
 
 # Log Rotation
-max_log_size = 5 * 1024 * 1024 # 5MB
-backup_count = 3 # Keep 3 logs
+max_log_size = 5 * 1024 * 1024  # 5MB
+backup_count = 3  # Keep 3 logs
 handler = RotatingFileHandler(LOG_FILE, maxBytes=max_log_size, backupCount=backup_count)
 formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 handler.setFormatter(formatter)
 logger = logging.getLogger("display_logger")
 logger.setLevel(logging.DEBUG)
 logger.addHandler(handler)
+
 
 def log_error(message):
     try:
@@ -47,7 +48,8 @@ def log_error(message):
     except Exception as e:
         print(f"Failed to log error {e}")
 
-# Clear the e-ink screen 
+
+# Clear the e-ink screen
 def screen_clear():
     try:
         subprocess.run(["python3", "clear.py"])
@@ -57,11 +59,12 @@ def screen_clear():
         log_error(f"Failed to clear display: {e}")
         return 1  # failure
 
+
 # Display an image
 def display_image(image_path):
     try:
         print(f"Now loading {image_path} to display")
-        subprocess.run(['python3', 'image.py', image_path])
+        subprocess.run(["python3", "image.py", image_path])
     except Exception as e:
         print(f"Failed to display image: {e}")
         log_error(f"Failed to display image: {e}")
@@ -71,7 +74,11 @@ def display_image(image_path):
 def main():
     logger.info(f"Starting main loop")
     try:
-        image_files = [os.path.join(image_dir, f) for f in os.listdir(image_dir) if f.endswith(('.png', '.jpg', '.jpeg'))]
+        image_files = [
+            os.path.join(image_dir, f)
+            for f in os.listdir(image_dir)
+            if f.endswith((".png", ".jpg", ".jpeg"))
+        ]
         display_functions = [
             lambda: show_pihole_stats(),
             lambda: display_image(random.choice(image_files)),
@@ -79,8 +86,8 @@ def main():
             lambda: display_apod(),
             lambda: check_birthdays(),
             lambda: get_date(),
-            ]
-        
+        ]
+
         current_index = 0
 
         while True:
@@ -92,13 +99,13 @@ def main():
                 else:
                     print(f"Error: Function at index {current_index} is None")
                     log_error(f"Error: Function at index {current_index} is None")
-                
+
                 # Wait for 20 minutes or button press
                 start_time = time.time()
                 while time.time() - start_time < 1200:  # 20 minutes
                     if button_a.is_pressed:
                         print("Skipping to next function")
-                        break    
+                        break
                     elif button_b.is_pressed:
                         current_index = 0
                         print("Jumping to displaying a picture")
@@ -108,11 +115,11 @@ def main():
                         screen_clear()
                         break
                     time.sleep(0.1)  # Check button press every 100ms
-                
+
                 current_index = (current_index + 1) % len(display_functions)
             except Exception as e:
                 log_error(f"Error during display function: {e}")
-                log_error(traceback.format_exc())               
+                log_error(traceback.format_exc())
                 current_index = (current_index + 1) % len(display_functions)
 
     except Exception as e:
@@ -128,6 +135,7 @@ def main():
 
     finally:
         logger.info("Process Exiting")
+
 
 if __name__ == "__main__":
     try:

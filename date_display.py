@@ -3,15 +3,18 @@ from PIL import Image, ImageDraw, ImageFont
 import datetime
 from inky.auto import auto
 
+
 def get_date():
-    
+
     # Prepare the display
     inky = auto()
     img = Image.open("./resources/imgs/Date-bg1-01.png")
     img = img.resize(inky.resolution)
     draw = ImageDraw.Draw(img)
-    display_width, display_height = img.size  # Assuming image is already resized to fit display
-    
+    display_width, display_height = (
+        img.size
+    )  # Assuming image is already resized to fit display
+
     # Pull the date elements into seperate variables
     todays_date = datetime.datetime.now()
     date_num = todays_date.strftime("%d")
@@ -51,6 +54,7 @@ def get_date():
 
     inky.set_image(img)
     inky.show()
+
 
 if __name__ == "__main__":
     get_date()

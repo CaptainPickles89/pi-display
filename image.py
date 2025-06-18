@@ -7,6 +7,7 @@ from PIL import Image
 
 from inky.auto import auto
 
+
 def display_image(image_path):
     inky = auto()
     image = Image.open(image_path)
@@ -20,6 +21,7 @@ def display_image(image_path):
             inky.set_image(resizedimage)
 
     inky.show()
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:

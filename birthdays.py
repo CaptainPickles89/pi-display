@@ -7,6 +7,7 @@ from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
 from inky.auto import auto
 
+
 def read_birthdays(file_path):
     try:
         with open(file_path, "r") as file:
@@ -19,22 +20,29 @@ def read_birthdays(file_path):
         print(f"Error loading birthdays: {e}")
         return {}
 
+
 def check_birthdays():
 
-    # Check if today is anyone's birthday    
+    # Check if today is anyone's birthday
     today = datetime.today()
-    today_day_month = today.strftime('%d-%m')  # Get current day and month in 'DD-MM' format
+    today_day_month = today.strftime(
+        "%d-%m"
+    )  # Get current day and month in 'DD-MM' format
     birthdays = read_birthdays("./birthdays.json")
 
     # Collect all matches for today's date
-    birthday_matches = [name for name, birthdate in birthdays.items() if birthdate.startswith(today_day_month)]
+    birthday_matches = [
+        name
+        for name, birthdate in birthdays.items()
+        if birthdate.startswith(today_day_month)
+    ]
 
     if birthday_matches:
         print("There are birthdays today!")
         inky = auto()
         img = Image.open("./resources/imgs/birthday-bg1-01.png")
         draw = ImageDraw.Draw(img)
-            
+
         # Font settings (update path to your font file)
         font_path = "./resources/fonts/Roboto-Medium.ttf"
         font = ImageFont.truetype(font_path, 50)
@@ -54,7 +62,9 @@ def check_birthdays():
         y_position = (image_height - text_height) // 2
 
         # Draw the text on the image
-        draw.multiline_text((x_position, y_position), message, font=font, align='center', fill=0)  # Black text
+        draw.multiline_text(
+            (x_position, y_position), message, font=font, align="center", fill=0
+        )  # Black text
         # Show on the Inky
         inky.set_image(img)
         inky.show()
@@ -62,6 +72,7 @@ def check_birthdays():
     else:
         print("No birthdays today.")
         return None
+
 
 if __name__ == "__main__":
     check_birthdays()
