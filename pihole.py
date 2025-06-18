@@ -24,7 +24,7 @@ def fetch_pihole_stats(api_url, password):
         return {
             "ads_blocked": data.get("queries", {}).get("blocked", "N/A"),
             "dns_queries": data.get("queries", {}).get("total", "N/A"),
-            "percentage_blocked": data.get("queries", {}).get("percent_blocked", "N/A"),
+            "percentage_blocked": round(data.get("queries", {}).get("percent_blocked", 0), 2),
             "unique_clients": data.get("clients", {}).get("active", "N/A"),
             "domains_blocked": data.get("gravity", {}).get("domains_being_blocked", "N/A"),
         }
