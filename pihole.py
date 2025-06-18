@@ -7,7 +7,6 @@ def get_sid(api_url, password):
     resp = requests.post(f"{api_url}/api/auth", json={"password": password})
     resp.raise_for_status()
     data = resp.json()
-    print(f"Response was: {data}")
     return data["session"]["sid"]
 
 
@@ -23,11 +22,13 @@ def fetch_pihole_stats(api_url, password):
         data = response.json()
 
         return {
-            "ads_blocked": data.get("ads_blocked_today", "N/A"),
-            "dns_queries": data.get("dns_queries_today", "N/A"),
-            "percentage_blocked": data.get("ads_percentage_today", "N/A"),
-            "unique_clients": data.get("unique_clients", "N/A"),
+            "ads_blocked": data.get("queries", {}).get("blocked", "N/A"),
+            "dns_queries": data.get("queries", {}).get("total", "N/A"),
+            "percentage_blocked": data.get("queries", {}).get("percent_blocked", "N/A"),
+            "unique_clients": data.get("clients", {}).get("active", "N/A"),
+            "domains_blocked": data.get("gravity", {}).get("domains_being_blocked", "N/A"),
         }
+
     except Exception as e:
         print(f"Failed to fetch Pi-hole stats: {e}")
         return None
