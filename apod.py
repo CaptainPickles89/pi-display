@@ -1,19 +1,22 @@
 import requests
+import traceback
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 from io import BytesIO
 from inky.auto import auto
 
+
 def load_api_key():
     # Path to your creds directory where the API key is stored
-    api_key_path = './creds/apod-api.txt'
+    api_key_path = "./creds/apod-api.txt"
 
     try:
-        with open(api_key_path, 'r') as f:
+        with open(api_key_path, "r") as f:
             api_key = f.read().strip()  # Remove any surrounding whitespace
         return api_key
     except FileNotFoundError:
         print(f"Error: API key file not found at {api_key_path}")
         return None
+
 
 def fetch_apod():
     # Grab API Key
@@ -21,23 +24,23 @@ def fetch_apod():
 
     # Fetch the Astronomy Picture of the Day (APOD) from NASA API.
     url = f"https://api.nasa.gov/planetary/apod?api_key={api_key}"
-    
+
     try:
         response = requests.get(url)
         response.raise_for_status()
         data = response.json()
-        
+
         # Check if the APOD has an image
         if data["media_type"] != "image":
             print("APOD is not an image today.")
             return None
-        
+
         # Fetch the image
         image_url = data["url"]
         image_title = data["title"]
         image_response = requests.get(image_url)
         image_response.raise_for_status()
-        
+
         # Open the image
         image = Image.open(BytesIO(image_response.content))
         return image, image_title
@@ -46,6 +49,7 @@ def fetch_apod():
         print(f"Failed to fetch APOD: {e}")
         return None
 
+
 def display_apod():
 
     # Fetch and display the APOD image on the Inky display.
@@ -53,13 +57,27 @@ def display_apod():
     inky_display = auto()
     inky_display.set_border(inky_display.BLACK)
 
-    apod_image, apod_title = fetch_apod()
-    if apod_image:
+    try:
+
+        result = fetch_apod()
+
+        # Handle None or malformed return
+        if not result or not isinstance(result, tuple) or len(result) != 2:
+            print("APOD fetch failed or returned unexpected result.")
+            return False
+        apod_image, apod_title = result
+
+        if apod_image is None:
+            print("No APOD image returned, skipping display.")
+            return False
+
         print(f"NASA Image of the day displaying now!")
         # Resize image to fit the Inky display
         apod_image = apod_image.resize(inky_display.resolution)
         # Get the resolution of the Inky display dynamically
-        display_width, display_height = apod_image.size  # Assuming image is already resized to fit display
+        display_width, display_height = (
+            apod_image.size
+        )  # Assuming image is already resized to fit display
         draw = ImageDraw.Draw(apod_image)
         # Font settings (update path to your font file)
         font_path = "./resources/fonts/Roboto-Regular.ttf"
@@ -68,14 +86,26 @@ def display_apod():
         text_width, text_height = draw.textsize(apod_title, font=title_font)
         x_position = display_width - text_width - 10  # 10px padding from the right
         y_position = display_height - text_height - 10  # 10px padding from the bottom
-        draw.text((x_position, y_position), apod_title, font=title_font, fill="white", stroke_width=2, stroke_fill="black")
+        draw.text(
+            (x_position, y_position),
+            apod_title,
+            font=title_font,
+            fill="white",
+            stroke_width=2,
+            stroke_fill="black",
+        )
         # Brighten the image slightly
         enhancer = ImageEnhance.Brightness(apod_image)
         apod_image = enhancer.enhance(1.5)
         inky_display.set_image(apod_image)
         inky_display.show()
-    else:
-        print("No APOD image to display.")
+        return True
+
+    except Exception as e:
+        print(f"Error displaying APOD: {e}")
+        traceback.print_exec()
+        return False
+
 
 if __name__ == "__main__":
     display_apod()
