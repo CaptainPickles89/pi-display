@@ -42,8 +42,8 @@ def fetch_apod():
         image_response.raise_for_status()
 
         # Open the image
-        image = Image.open(BytesIO(image_response.content))
-        return image, image_title
+        with Image.open(BytesIO(image_response.content)) as image:
+            return image, image_title
 
     except requests.exceptions.RequestException as e:
         print(f"Failed to fetch APOD: {e}")
