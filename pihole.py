@@ -50,34 +50,34 @@ def load_password():
 
 def display_pihole_stats(stats):
     inky = auto()
-    img = Image.open("./resources/imgs/pihole-bg1-01.png")
-    draw = ImageDraw.Draw(img)
+    with Image.open("./resources/imgs/pihole-bg1-01.png") as img:
+        draw = ImageDraw.Draw(img)
 
-    font_path = "./resources/fonts/Roboto-Medium.ttf"
-    font = ImageFont.truetype(font_path, 45)
+        font_path = "./resources/fonts/Roboto-Medium.ttf"
+        font = ImageFont.truetype(font_path, 45)
 
-    stats_text = (
-        f"Unique Clients: {stats['unique_clients']}\n"
-        f"Ads Blocked: {stats['ads_blocked']}\n"
-        f"DNS Queries: {stats['dns_queries']}\n"
-        f"Domains Blocked: {stats['domains_blocked']}\n"
-        f"Blocked: {stats['percentage_blocked']}%"
-    )
+        stats_text = (
+            f"Unique Clients: {stats['unique_clients']}\n"
+            f"Ads Blocked: {stats['ads_blocked']}\n"
+            f"DNS Queries: {stats['dns_queries']}\n"
+            f"Domains Blocked: {stats['domains_blocked']}\n"
+            f"Blocked: {stats['percentage_blocked']}%"
+        )
 
-    text_bbox = draw.multiline_textbbox((0, 0), stats_text, font=font)
-    text_width = text_bbox[2] - text_bbox[0]
-    text_height = text_bbox[3] - text_bbox[1]
+        text_bbox = draw.multiline_textbbox((0, 0), stats_text, font=font)
+        text_width = text_bbox[2] - text_bbox[0]
+        text_height = text_bbox[3] - text_bbox[1]
 
-    image_width, image_height = img.size
-    x_position = (image_width - text_width) // 2
-    y_position = (image_height - text_height) // 2
+        image_width, image_height = img.size
+        x_position = (image_width - text_width) // 2
+        y_position = (image_height - text_height) // 2
 
-    draw.multiline_text(
-        (x_position, y_position), stats_text, font=font, align="center", fill=0
-    )
+        draw.multiline_text(
+            (x_position, y_position), stats_text, font=font, align="center", fill=0
+        )
 
-    inky.set_image(img)
-    inky.show()
+        inky.set_image(img)
+        inky.show()
 
 
 def show_pihole_stats():
