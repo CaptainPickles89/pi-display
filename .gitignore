@@ -17,3 +17,6 @@ birthdays.json
 
 # Ignore Mike's File
 mike-test.py
+
+# Ignore test files
+test.py
