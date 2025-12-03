@@ -60,13 +60,13 @@ def display_stock_graph(graph_path):
     # Prepare the display
     inky = auto()
     saturation = 0.5
-    img = Image.open(graph_path)
-    resizedimage = img.resize(inky.resolution)
-    try:
-        inky.set_image(resizedimage, saturation=saturation)
-    except TypeError:
-        inky.set_image(resizedimage)
-    inky.show()
+    with Image.open(graph_path) as img:
+        resizedimage = img.resize(inky.resolution)
+        try:
+            inky.set_image(resizedimage, saturation=saturation)
+        except TypeError:
+            inky.set_image(resizedimage)
+        inky.show()
 
 
 if __name__ == "__main__":
