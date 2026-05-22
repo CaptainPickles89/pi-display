@@ -4,7 +4,7 @@ from inky.auto import auto
 
 
 def get_sid(api_url, password):
-    resp = requests.post(f"{api_url}/api/auth", json={"password": password})
+    resp = requests.post(f"{api_url}/api/auth", json={"password": password}, timeout=10)
     resp.raise_for_status()
     data = resp.json()
     return data["session"]["sid"]
@@ -16,7 +16,7 @@ def fetch_pihole_stats(api_url, password):
         headers = {"X-FTL-SID": sid}
 
         stats_url = f"{api_url}/api/stats/summary"
-        response = requests.get(stats_url, headers=headers)
+        response = requests.get(stats_url, headers=headers, timeout=10)
         response.raise_for_status()
 
         data = response.json()
@@ -81,7 +81,7 @@ def display_pihole_stats(stats):
 
 
 def show_pihole_stats():
-    api_url = "http://192.168.7.213"
+    api_url = "http://192.168.1.110"
     password = load_password()
 
     if not password:
