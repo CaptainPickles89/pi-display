@@ -20,3 +20,6 @@ mike-test.py
 
 # Ignore test files
 test.py
+
+# Claude
+CLAUDE.md

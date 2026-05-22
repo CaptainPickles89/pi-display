@@ -83,7 +83,9 @@ def display_apod():
         font_path = "./resources/fonts/Roboto-Regular.ttf"
         title_font = ImageFont.truetype(font_path, 25)
         # Get text size to calculate bottom-right position
-        text_width, text_height = draw.textsize(apod_title, font=title_font)
+        bbox = draw.textbbox((0, 0), apod_title, font=title_font)
+        text_width = bbox[2] - bbox[0]
+        text_height = bbox[3] - bbox[1]
         x_position = display_width - text_width - 10  # 10px padding from the right
         y_position = display_height - text_height - 10  # 10px padding from the bottom
         draw.text(
@@ -103,7 +105,7 @@ def display_apod():
 
     except Exception as e:
         print(f"Error displaying APOD: {e}")
-        traceback.print_exec()
+        traceback.print_exc()
         return False
 
 
