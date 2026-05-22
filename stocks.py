@@ -37,8 +37,9 @@ def is_new_market_day(last_fetch_ts):
 # ----------------- Stock Fetching -----------------
 def fetch_stock(symbol):
     """
-    Fetch stock price from Yahoo or from cache if available.
-    Returns the latest close price and price change from previous day.
+    Fetch stock data from Yahoo or from cache if available.
+    Returns (latest_close, price_change, history_pairs) where history_pairs
+    is a list of [timestamp_ms, close_price] for graph plotting.
     """
     cache = load_cache()
     cached_entry = cache.get(symbol)
@@ -52,37 +53,49 @@ def fetch_stock(symbol):
     if use_cache:
         latest_close = cached_entry["latest_close"]
         previous_close = cached_entry["previous_close"]
+        history_pairs = cached_entry.get("history", [])
         print(f"Using cached price for {symbol}: {latest_close:.2f}")
     else:
         stock = yf.Ticker(symbol)
+        hist = None
         for attempt in range(3):
             try:
                 hist = stock.history(period="6mo")
                 if not hist.empty:
-                    latest_close = hist["Close"].iloc[-1]
-                    previous_close = hist["Close"].iloc[-2]
-                    cache[symbol] = {
-                        "latest_close": latest_close,
-                        "previous_close": previous_close,
-                        "timestamp": time.time()
-                    }
-                    save_cache(cache)
                     break
+                else:
+                    print(f"No data returned for {symbol} (attempt {attempt+1}/3)")
             except Exception as e:
                 print(f"Attempt {attempt+1} failed for {symbol}: {e}")
-            print(f"Yahoo rate-limited request, retrying {attempt+1}/3...")
-            time.sleep(5)
+            if attempt < 2:
+                print(f"Retrying in 5s...")
+                time.sleep(5)
+
+        if hist is not None and not hist.empty:
+            latest_close = hist["Close"].iloc[-1]
+            previous_close = hist["Close"].iloc[-2]
+            history_pairs = [
+                [int(ts.timestamp() * 1000), float(close)]
+                for ts, close in zip(hist.index, hist["Close"])
+            ]
+            cache[symbol] = {
+                "latest_close": float(latest_close),
+                "previous_close": float(previous_close),
+                "history": history_pairs,
+                "timestamp": time.time()
+            }
+            save_cache(cache)
+        elif cached_entry:
+            latest_close = cached_entry["latest_close"]
+            previous_close = cached_entry["previous_close"]
+            history_pairs = cached_entry.get("history", [])
+            print(f"Using stale cached price for {symbol}: {latest_close:.2f}")
         else:
-            if cached_entry:
-                latest_close = cached_entry["latest_close"]
-                previous_close = cached_entry["previous_close"]
-                print(f"Using stale cached price for {symbol}: {latest_close:.2f}")
-            else:
-                print(f"No data available for {symbol}")
-                return None, None
+            print(f"No data available for {symbol}")
+            return None, None, None
 
     price_change = latest_close - previous_close
-    return latest_close, price_change
+    return latest_close, price_change, history_pairs
 
 
 # ----------------- Display Utilities -----------------
@@ -102,7 +115,7 @@ def display_stock_graph(graph_path):
 # ----------------- Main Function -----------------
 def fetch_and_display_stock(symbol):
     """Fetch stock, print latest price, plot graph, and display on Inky."""
-    latest_close, price_change = fetch_stock(symbol)
+    latest_close, price_change, history_pairs = fetch_stock(symbol)
     if latest_close is None:
         print(f"No price data for {symbol}")
         return
@@ -110,22 +123,23 @@ def fetch_and_display_stock(symbol):
     direction = "▲" if price_change > 0 else "▼"
     print(f"The latest closing price for {symbol} is {latest_close:.2f} ({direction}{abs(price_change):.2f})")
 
-    # Fetch historical data for plotting (6 months)
-    stock = yf.Ticker(symbol)
-    hist = stock.history(period="6mo")
-    if hist.empty:
+    if not history_pairs:
         print(f"No historical data for {symbol}")
         return
 
+    # Reconstruct dates and closes from cached history pairs
+    dates = [datetime.fromtimestamp(ts_ms / 1000, tz=timezone.utc) for ts_ms, _ in history_pairs]
+    closes = [close for _, close in history_pairs]
+
     # Plot graph
     plt.figure(figsize=(4, 3))
-    plt.plot(hist.index, hist["Close"], label="Closing Price", color="blue")
+    plt.plot(dates, closes, label="Closing Price", color="blue")
     ax = plt.gca()
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%d-%b"))
     plt.xticks(rotation=45)
     plt.xlabel("Date")
     plt.ylabel("Price")
-    plt.title(f"{symbol} - 6 Month Performance")
+    plt.title(f"{symbol} - 6 Month Performance ({direction}{abs(price_change):.2f})")
     plt.grid(True)
     plt.legend()
 
