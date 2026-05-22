@@ -1,7 +1,9 @@
 import os
 import sys
+import io
 import json
 import time
+import contextlib
 from datetime import datetime, timezone
 import yfinance as yf
 import matplotlib.pyplot as plt
@@ -60,11 +62,14 @@ def fetch_stock(symbol):
         hist = None
         for attempt in range(3):
             try:
-                hist = stock.history(period="6mo")
+                stderr_capture = io.StringIO()
+                with contextlib.redirect_stderr(stderr_capture):
+                    hist = stock.history(period="6mo")
+                reason = stderr_capture.getvalue().strip()
                 if not hist.empty:
                     break
                 else:
-                    print(f"No data returned for {symbol} (attempt {attempt+1}/3)")
+                    print(f"No data returned for {symbol} (attempt {attempt+1}/3): {reason or 'unknown reason'}")
             except Exception as e:
                 print(f"Attempt {attempt+1} failed for {symbol}: {e}")
             if attempt < 2:
