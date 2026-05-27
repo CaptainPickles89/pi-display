@@ -53,24 +53,51 @@ def display_pi_health():
         disk_str = f"{disk.percent}%"
         disk_sub = f"{fmt_bytes(disk.used)} / {fmt_bytes(disk.total)} GB"
 
-        # Layout: 2x2 grid
-        # col_x: left=50, right=330  row_y: top=90, bottom=270
-        cells = [
-            ("CPU Temp", temp_str, None, 50, 90),
-            ("CPU Usage", cpu_str, None, 330, 90),
-            ("RAM", ram_str, ram_sub, 50, 270),
-            ("Disk", disk_str, disk_sub, 330, 270),
-        ]
+        # Grid lines first (drawn behind text)
+        mid_x = width // 2
+        mid_y = 62 + (height - 62) // 2  # vertical midpoint of content area
+        draw.line([(mid_x, 70), (mid_x, height - 10)], fill="black", width=1)
+        draw.line([(20, mid_y), (width - 20, mid_y)], fill="black", width=1)
 
-        for label, value, sub, x, y in cells:
-            draw.text((x, y), label, font=font_label, fill="black")
-            draw.text((x, y + 34), value, font=font_value, fill="black")
+        # 2x2 grid — centre content in each quadrant
+        col_w = width // 2
+        row_h = (height - 62) // 2
+
+        def draw_cell(label, value, sub, col, row):
+            # Quadrant bounds
+            qx = col * col_w
+            qy = 62 + row * row_h
+
+            # Measure total content block height
+            lh = draw.textbbox((0, 0), label, font=font_label)
+            vh = draw.textbbox((0, 0), value, font=font_value)
+            label_h = lh[3] - lh[1]
+            value_h = vh[3] - vh[1]
+            gap = 6
+            block_h = label_h + gap + value_h
             if sub:
-                draw.text((x, y + 100), sub, font=font_sub, fill="black")
+                sh = draw.textbbox((0, 0), sub, font=font_sub)
+                block_h += gap + (sh[3] - sh[1])
 
-        # Grid lines
-        draw.line([(width // 2, 70), (width // 2, height - 10)], fill="black", width=1)
-        draw.line([(20, height // 2 + 20), (width - 20, height // 2 + 20)], fill="black", width=1)
+            # Vertical start to centre block in quadrant
+            ty = qy + (row_h - block_h) // 2
+
+            def draw_centred(text, font, y):
+                b = draw.textbbox((0, 0), text, font=font)
+                tx = qx + (col_w - (b[2] - b[0])) // 2
+                draw.text((tx, y), text, font=font, fill="black")
+
+            draw_centred(label, font_label, ty)
+            ty += label_h + gap
+            draw_centred(value, font_value, ty)
+            if sub:
+                ty += value_h + gap
+                draw_centred(sub, font_sub, ty)
+
+        draw_cell("CPU Temp",  temp_str, None,    col=0, row=0)
+        draw_cell("CPU Usage", cpu_str,  None,    col=1, row=0)
+        draw_cell("RAM",       ram_str,  ram_sub, col=0, row=1)
+        draw_cell("Disk",      disk_str, disk_sub, col=1, row=1)
 
         inky.set_image(image)
         inky.show()
