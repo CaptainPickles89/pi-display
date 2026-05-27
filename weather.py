@@ -303,8 +303,11 @@ def display_weather():
             mid = col_x + col_w // 2
 
             col_centered_text(day_name, font_day, 326, mid)
-            draw_icon(draw, mid, 368, 56, day_code)
-            col_centered_text(f"{hi}°", font_hilo, 402, mid)
+            # Icon left of centre, temp right of icon — same line
+            icon_x = col_x + 62
+            temp_x = col_x + 108
+            draw_icon(draw, icon_x, 378, 52, day_code)
+            draw.text((temp_x, 362), f"{hi}°", font=font_hilo, fill=C_BLACK)
 
             if i < 3:
                 draw.line([(col_x + col_w, 324), (col_x + col_w, height - 8)],
