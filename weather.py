@@ -1,3 +1,4 @@
+import math
 import requests
 from PIL import Image, ImageDraw, ImageFont
 from inky.auto import auto
@@ -35,6 +36,145 @@ WMO_CODES = {
 
 DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
+# Colors (Inky Impression supports black, white, red, yellow, green, blue, orange)
+C_SUN = (220, 170, 0)
+C_SUN_OUTLINE = (180, 120, 0)
+C_CLOUD_FILL = (180, 180, 180)
+C_CLOUD_OUT = (60, 60, 60)
+C_RAIN = (0, 80, 200)
+C_SNOW = (80, 130, 220)
+C_LIGHTNING = (220, 170, 0)
+C_FOG = (120, 120, 120)
+C_BLACK = (0, 0, 0)
+
+
+# --- Icon drawing primitives ---
+
+def _sun(draw, cx, cy, size):
+    lw = max(2, size // 16)
+    r = size // 4
+    ray_in = int(size * 0.33)
+    ray_out = int(size * 0.48)
+    for i in range(8):
+        a = i * math.pi / 4
+        draw.line(
+            [cx + int(ray_in * math.cos(a)), cy + int(ray_in * math.sin(a)),
+             cx + int(ray_out * math.cos(a)), cy + int(ray_out * math.sin(a))],
+            fill=C_SUN, width=lw,
+        )
+    draw.ellipse([cx - r, cy - r, cx + r, cy + r],
+                 fill=C_SUN, outline=C_SUN_OUTLINE, width=lw)
+
+
+def _cloud(draw, cx, cy, size):
+    lw = max(1, size // 22)
+    bw = int(size * 0.74)
+    bh = int(size * 0.28)
+    bx1, bx2 = cx - bw // 2, cx + bw // 2
+    by1, by2 = cy - bh // 4, cy + bh * 3 // 4
+    bumps = [
+        (cx - bw // 4, by1 - int(size * 0.09), int(size * 0.17)),
+        (cx,           by1 - int(size * 0.17), int(size * 0.22)),
+        (cx + bw // 4, by1 - int(size * 0.07), int(size * 0.16)),
+    ]
+    for bx, sby, br in bumps:
+        draw.ellipse([bx - br, sby - br, bx + br, sby + br], fill=C_CLOUD_FILL)
+    draw.rounded_rectangle([bx1, by1, bx2, by2], radius=bh // 3, fill=C_CLOUD_FILL)
+    for bx, sby, br in bumps:
+        draw.ellipse([bx - br, sby - br, bx + br, sby + br],
+                     outline=C_CLOUD_OUT, width=lw)
+    draw.rounded_rectangle([bx1, by1, bx2, by2], radius=bh // 3,
+                            outline=C_CLOUD_OUT, width=lw)
+
+
+def _rain_drops(draw, cx, cy, size, count=3):
+    dr = max(2, size // 14)
+    gap = int(size * 0.22)
+    sx = cx - gap * (count - 1) // 2
+    for i in range(count):
+        dx = sx + i * gap
+        draw.ellipse([dx - dr, cy - dr, dx + dr, cy + dr], fill=C_RAIN)
+
+
+def _snow_flakes(draw, cx, cy, size, count=3):
+    lw = max(1, size // 18)
+    r = max(3, size // 9)
+    gap = int(size * 0.22)
+    sx = cx - gap * (count - 1) // 2
+    for i in range(count):
+        fx = sx + i * gap
+        for a in [0, math.pi / 3, 2 * math.pi / 3]:
+            draw.line(
+                [fx + int(r * math.cos(a)), cy + int(r * math.sin(a)),
+                 fx - int(r * math.cos(a)), cy - int(r * math.sin(a))],
+                fill=C_SNOW, width=lw,
+            )
+
+
+def _lightning(draw, cx, cy, size):
+    lw = max(2, size // 12)
+    pts = [
+        (cx + int(size * 0.10), cy - int(size * 0.22)),
+        (cx - int(size * 0.06), cy + int(size * 0.02)),
+        (cx + int(size * 0.04), cy + int(size * 0.02)),
+        (cx - int(size * 0.10), cy + int(size * 0.24)),
+    ]
+    draw.line(pts, fill=C_LIGHTNING, width=lw)
+
+
+def _fog_lines(draw, cx, cy, size):
+    lw = max(2, size // 14)
+    hw = int(size * 0.40)
+    sp = int(size * 0.15)
+    for i in range(-1, 2):
+        y = cy + i * sp
+        draw.line([cx - hw, y, cx + hw, y], fill=C_FOG, width=lw)
+
+
+def _icon_group(code):
+    if code == 0:
+        return "sun"
+    if code in (1, 2):
+        return "sun_cloud"
+    if code == 3:
+        return "cloud"
+    if code in (45, 48):
+        return "fog"
+    if code in (51, 53, 55, 61, 63, 65, 80, 81, 82):
+        return "rain"
+    if code in (71, 73, 75, 77, 85, 86):
+        return "snow"
+    if code in (95, 96, 99):
+        return "storm"
+    return "cloud"
+
+
+def draw_icon(draw, cx, cy, size, code):
+    group = _icon_group(code)
+    cloud_cy = cy + int(size * 0.05)
+    precip_cy = cy + int(size * 0.38)
+
+    if group == "sun":
+        _sun(draw, cx, cy, size)
+    elif group == "sun_cloud":
+        _sun(draw, cx + int(size * 0.18), cy - int(size * 0.18), int(size * 0.72))
+        _cloud(draw, cx - int(size * 0.06), cy + int(size * 0.12), int(size * 0.78))
+    elif group == "cloud":
+        _cloud(draw, cx, cy, size)
+    elif group == "fog":
+        _fog_lines(draw, cx, cy, size)
+    elif group == "rain":
+        _cloud(draw, cx, cloud_cy, size)
+        _rain_drops(draw, cx, precip_cy, size)
+    elif group == "snow":
+        _cloud(draw, cx, cloud_cy, size)
+        _snow_flakes(draw, cx, precip_cy, size)
+    elif group == "storm":
+        _cloud(draw, cx, cloud_cy, size)
+        _lightning(draw, cx, precip_cy, size)
+
+
+# --- Data fetch ---
 
 def fetch_weather(lat, lon):
     url = (
@@ -48,6 +188,8 @@ def fetch_weather(lat, lon):
     resp.raise_for_status()
     return resp.json()
 
+
+# --- Display ---
 
 def display_weather():
     try:
@@ -71,11 +213,12 @@ def display_weather():
         draw = ImageDraw.Draw(image)
 
         font_header = ImageFont.truetype(FONT_PATH, 32)
-        font_temp = ImageFont.truetype(FONT_PATH, 88)
-        font_condition = ImageFont.truetype(FONT_PATH, 38)
-        font_detail = ImageFont.truetype(FONT_PATH, 28)
-        font_day_label = ImageFont.truetype(FONT_PATH, 26)
-        font_day_val = ImageFont.truetype(FONT_PATH, 30)
+        font_temp_hdr = ImageFont.truetype(FONT_PATH, 36)
+        font_condition = ImageFont.truetype(FONT_PATH, 36)
+        font_detail = ImageFont.truetype(FONT_PATH, 26)
+        font_day = ImageFont.truetype(FONT_PATH, 24)
+        font_hilo = ImageFont.truetype(FONT_PATH, 25)
+        font_rain = ImageFont.truetype(FONT_PATH, 21)
 
         current = data["current"]
         daily = data["daily"]
@@ -86,32 +229,40 @@ def display_weather():
         precip = current["precipitation"]
         condition = WMO_CODES.get(code, "Unknown")
 
-        # Header
-        draw.text((20, 16), "Weather", font=font_header, fill="black")
-        now_str = datetime.now().strftime("%H:%M")
-        draw.text((width - 90, 16), now_str, font=font_header, fill="black")
+        def centered_text(text, font, y, fill=C_BLACK):
+            b = draw.textbbox((0, 0), text, font=font)
+            x = (width - (b[2] - b[0])) // 2
+            draw.text((x, y), text, font=font, fill=fill)
 
-        # Current temp — centered
+        def col_centered_text(text, font, y, col_mid, fill=C_BLACK):
+            b = draw.textbbox((0, 0), text, font=font)
+            x = col_mid - (b[2] - b[0]) // 2
+            draw.text((x, y), text, font=font, fill=fill)
+
+        # Header row: "Weather" left, current temp right
+        draw.text((20, 16), "Weather", font=font_header, fill=C_BLACK)
         temp_str = f"{temp_c}°C"
-        bbox = draw.textbbox((0, 0), temp_str, font=font_temp)
-        tx = (width - (bbox[2] - bbox[0])) // 2
-        draw.text((tx, 55), temp_str, font=font_temp, fill="black")
-
-        # Condition — centered
-        bbox = draw.textbbox((0, 0), condition, font=font_condition)
-        cx = (width - (bbox[2] - bbox[0])) // 2
-        draw.text((cx, 175), condition, font=font_condition, fill="black")
-
-        # Wind + precip row — centered
-        detail_str = f"Wind: {wind} km/h    Rain: {precip} mm"
-        bbox = draw.textbbox((0, 0), detail_str, font=font_detail)
-        dx = (width - (bbox[2] - bbox[0])) // 2
-        draw.text((dx, 228), detail_str, font=font_detail, fill="black")
+        tb = draw.textbbox((0, 0), temp_str, font=font_temp_hdr)
+        draw.text((width - (tb[2] - tb[0]) - 20, 14), temp_str,
+                  font=font_temp_hdr, fill=C_BLACK)
 
         # Divider
-        draw.line([(20, 272), (width - 20, 272)], fill="black", width=2)
+        draw.line([(20, 58), (width - 20, 58)], fill=C_BLACK, width=2)
 
-        # 3-day forecast (daily[0] is today, show +1, +2, +3)
+        # Large current weather icon
+        draw_icon(draw, width // 2, 162, 160, code)
+
+        # Condition text
+        centered_text(condition, font_condition, 254)
+
+        # Wind + precip detail
+        detail_str = f"Wind: {wind} km/h    Rain: {precip} mm"
+        centered_text(detail_str, font_detail, 298)
+
+        # Divider
+        draw.line([(20, 326), (width - 20, 326)], fill=C_BLACK, width=2)
+
+        # 3-day forecast strip
         col_w = width // 3
         for i in range(1, 4):
             date_str = daily["time"][i]
@@ -120,27 +271,18 @@ def display_weather():
             lo = round(daily["temperature_2m_min"][i])
             rain_pct = daily["precipitation_probability_max"][i]
             day_code = daily["weathercode"][i]
-            day_cond = WMO_CODES.get(day_code, "")
-            # Truncate long condition names
-            if len(day_cond) > 13:
-                day_cond = day_cond[:12] + "."
 
             col_x = (i - 1) * col_w
-            mid_x = col_x + col_w // 2
+            mid = col_x + col_w // 2
 
-            def centered(text, font, y):
-                b = draw.textbbox((0, 0), text, font=font)
-                x = mid_x - (b[2] - b[0]) // 2
-                draw.text((x, y), text, font=font, fill="black")
+            col_centered_text(day_name, font_day, 330, mid)
+            draw_icon(draw, mid, 372, 58, day_code)
+            col_centered_text(f"{hi}° / {lo}°", font_hilo, 404, mid)
+            col_centered_text(f"Rain: {rain_pct}%", font_rain, 428, mid)
 
-            centered(day_name, font_day_label, 284)
-            centered(day_cond, font_day_label, 314)
-            centered(f"{hi}° / {lo}°", font_day_val, 350)
-            centered(f"Rain: {rain_pct}%", font_day_label, 392)
-
-            # Column dividers
             if i < 3:
-                draw.line([(col_x + col_w, 280), (col_x + col_w, height - 10)], fill="black", width=1)
+                draw.line([(col_x + col_w, 328), (col_x + col_w, height - 8)],
+                          fill=C_BLACK, width=1)
 
         inky.set_image(image)
         inky.show()
