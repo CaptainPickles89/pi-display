@@ -11,7 +11,7 @@ import matplotlib.dates as mdates
 from PIL import Image
 from inky.auto import auto
 
-CACHE_FILE = "/tmp/stock_cache.json"
+CACHE_FILE = os.path.join(os.path.expanduser("~"), ".stock_cache.json")
 
 # ----------------- Cache Utilities -----------------
 def load_cache():
