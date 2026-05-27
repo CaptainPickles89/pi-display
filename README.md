@@ -46,6 +46,7 @@ Any error logging is currently sent to __pi-display.log__ in the project directo
  - [Date](#date)
  - [Weather](#weather)
  - [Pi Health](#pi-health)
+ - [Speedtest](#speedtest)
 
 ## Pictures
 
@@ -110,6 +111,31 @@ To configure your location, create a file at __creds/weather-location.txt__ cont
 ## Pi Health
 
 Displays a live snapshot of the Raspberry Pi's system stats: CPU temperature, CPU usage %, RAM usage, and disk usage. No external API or credentials required.
+
+## Speedtest
+
+Shows the latest download speed, upload speed, and ping, along with a trend graph of historical results. Results are collected twice daily (midnight and noon) by a separate runner script, so the display always shows cached data without blocking the main loop.
+
+### Setup
+
+**1. Install the dependency:**
+```bash
+pip install speedtest-cli
+```
+
+**2. Add cron jobs to run the speedtest at midnight and noon** (`crontab -e`):
+```
+0 0  * * * /usr/bin/python3 /home/danny/pi-display/speedtest_runner.py
+0 12 * * * /usr/bin/python3 /home/danny/pi-display/speedtest_runner.py
+```
+Adjust the path to match your install location. If using a virtual environment, replace `/usr/bin/python3` with the path to your venv Python binary (e.g. `/home/danny/pi-display/eink_display_venv/bin/python3`).
+
+**3. Seed your first result** so the display has data straight away:
+```bash
+python3 speedtest_runner.py
+```
+
+Results are stored in __~/.speedtest_history.json__ (up to 60 entries, ~30 days). The display will show a "no data yet" message until the first run completes.
 
 ## Credits
 
