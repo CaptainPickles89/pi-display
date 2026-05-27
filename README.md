@@ -34,7 +34,7 @@ $ source eink_display_venv/bin/activate
 python3 main.py > /dev/null 2>&1 & 
 ```
 
-Any error logging is currently sent __/tmp/pi-display.log__ should you face any issues
+Any error logging is currently sent to __pi-display.log__ in the project directory should you face any issues
 
 ## Current Features
  - [Pictures](#pictures)
@@ -44,6 +44,8 @@ Any error logging is currently sent __/tmp/pi-display.log__ should you face any 
  - [NASA APOD](#nasa-apod)
  - [Clear](#clear)
  - [Date](#date)
+ - [Weather](#weather)
+ - [Pi Health](#pi-health)
 
 ## Pictures
 
@@ -96,6 +98,19 @@ Example Output:
 
 ![Date Example](/docs/date_example.png)
 
+## Weather
+
+Fetches current conditions and a 3-day forecast from [Open-Meteo](https://open-meteo.com/) (free, no API key required). Displays current temperature, weather condition, wind speed, and daily high/low with rain probability for the next 3 days.
+
+To configure your location, create a file at __creds/weather-location.txt__ containing your latitude and longitude separated by a comma:
+```
+51.5074,-0.1278
+```
+
+## Pi Health
+
+Displays a live snapshot of the Raspberry Pi's system stats: CPU temperature, CPU usage %, RAM usage, and disk usage. No external API or credentials required.
+
 ## Credits
 
 This project uses the **Roboto** font, which is licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).  
@@ -108,6 +123,6 @@ This project also uses the following libraries and resources:
 - [Pillow](https://pillow.readthedocs.io/)
 - And many others...
 
-Special thanks to [ChatGPT](https://chatgpt.com) by OpenAI for assistance with coding and design ideas.
+Special thanks to [ChatGPT](https://chatgpt.com) by OpenAI and [Claude Code](https://claude.ai/code) by Anthropic for assistance with coding and design ideas.
 
 Please refer to the `LICENSE` file for more detailed license information.

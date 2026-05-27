@@ -11,6 +11,7 @@ creds/alphavantage-api.txt
 creds/apod-api.txt
 creds/client_secret.json
 creds/token.json
+creds/weather-location.txt
 
 # Ignore birthday list
 birthdays.json

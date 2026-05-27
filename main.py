@@ -11,6 +11,8 @@ from stocks import fetch_and_display_stock
 from pihole import show_pihole_stats
 from birthdays import check_birthdays
 from date_display import get_date
+from weather import display_weather
+from pi_health import display_pi_health
 from gpiozero import Button
 from inky.auto import auto
 
@@ -86,6 +88,8 @@ def main():
             lambda: display_apod(),
             lambda: check_birthdays(),
             lambda: get_date(),
+            lambda: display_weather(),
+            lambda: display_pi_health(),
         ]
 
         current_index = 0
