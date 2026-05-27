@@ -181,7 +181,7 @@ def fetch_weather(lat, lon):
         "https://api.open-meteo.com/v1/forecast"
         f"?latitude={lat}&longitude={lon}"
         "&current=temperature_2m,weathercode,windspeed_10m,precipitation"
-        "&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode"
+        "&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode,sunrise,sunset"
         "&timezone=auto&forecast_days=4"
     )
     resp = requests.get(url, timeout=10)
@@ -214,11 +214,12 @@ def display_weather():
 
         font_header = ImageFont.truetype(FONT_PATH, 32)
         font_temp_hdr = ImageFont.truetype(FONT_PATH, 36)
-        font_condition = ImageFont.truetype(FONT_PATH, 36)
-        font_detail = ImageFont.truetype(FONT_PATH, 26)
-        font_day = ImageFont.truetype(FONT_PATH, 24)
-        font_hilo = ImageFont.truetype(FONT_PATH, 25)
-        font_rain = ImageFont.truetype(FONT_PATH, 21)
+        font_info_label = ImageFont.truetype(FONT_PATH, 22)
+        font_info_val = ImageFont.truetype(FONT_PATH, 30)
+        font_condition = ImageFont.truetype(FONT_PATH, 32)
+        font_day = ImageFont.truetype(FONT_PATH, 23)
+        font_hilo = ImageFont.truetype(FONT_PATH, 24)
+        font_rain = ImageFont.truetype(FONT_PATH, 20)
 
         current = data["current"]
         daily = data["daily"]
@@ -228,41 +229,65 @@ def display_weather():
         wind = round(current["windspeed_10m"])
         precip = current["precipitation"]
         condition = WMO_CODES.get(code, "Unknown")
+        hi_today = round(daily["temperature_2m_max"][0])
+        lo_today = round(daily["temperature_2m_min"][0])
 
-        def centered_text(text, font, y, fill=C_BLACK):
-            b = draw.textbbox((0, 0), text, font=font)
-            x = (width - (b[2] - b[0])) // 2
-            draw.text((x, y), text, font=font, fill=fill)
+        def parse_time(dt_str):
+            return datetime.strptime(dt_str, "%Y-%m-%dT%H:%M").strftime("%H:%M")
+
+        sunrise = parse_time(daily["sunrise"][0])
+        sunset = parse_time(daily["sunset"][0])
 
         def col_centered_text(text, font, y, col_mid, fill=C_BLACK):
             b = draw.textbbox((0, 0), text, font=font)
             x = col_mid - (b[2] - b[0]) // 2
             draw.text((x, y), text, font=font, fill=fill)
 
-        # Header row: "Weather" left, current temp right
-        draw.text((20, 16), "Weather", font=font_header, fill=C_BLACK)
+        # ── Header ──────────────────────────────────────────────────
+        draw.text((20, 14), "Weather", font=font_header, fill=C_BLACK)
         temp_str = f"{temp_c}°C"
         tb = draw.textbbox((0, 0), temp_str, font=font_temp_hdr)
-        draw.text((width - (tb[2] - tb[0]) - 20, 14), temp_str,
+        draw.text((width - (tb[2] - tb[0]) - 20, 12), temp_str,
                   font=font_temp_hdr, fill=C_BLACK)
-
-        # Divider
         draw.line([(20, 58), (width - 20, 58)], fill=C_BLACK, width=2)
 
-        # Large current weather icon
-        draw_icon(draw, width // 2, 162, 160, code)
+        # ── Main section: icon left, info right ──────────────────────
+        icon_cx = 148
+        icon_cy = 188
+        draw_icon(draw, icon_cx, icon_cy, 200, code)
 
-        # Condition text
-        centered_text(condition, font_condition, 254)
+        # Vertical divider between icon and info panel
+        draw.line([(296, 64), (296, 318)], fill=C_BLACK, width=1)
 
-        # Wind + precip detail
-        detail_str = f"Wind: {wind} km/h    Rain: {precip} mm"
-        centered_text(detail_str, font_detail, 298)
+        # Info panel — right side starting at x=310
+        info_x = 310
+        info_rows = [
+            (condition,                   None),
+            (f"{hi_today}° / {lo_today}°", "High / Low"),
+            (f"{wind} km/h",              "Wind"),
+            (f"{precip} mm",              "Rain"),
+            (f"☀ {sunrise}",          "Sunrise"),
+            (f"☽ {sunset}",           "Sunset"),
+        ]
 
-        # Divider
-        draw.line([(20, 326), (width - 20, 326)], fill=C_BLACK, width=2)
+        row_y = 66
+        row_gap = 40
+        for value, label in info_rows:
+            if label:
+                draw.text((info_x, row_y), label, font=font_info_label,
+                          fill=(100, 100, 100))
+                draw.text((info_x, row_y + 20), value, font=font_info_val,
+                          fill=C_BLACK)
+                row_y += row_gap + 18
+            else:
+                # Condition — no label, larger
+                draw.text((info_x, row_y), value, font=font_condition,
+                          fill=C_BLACK)
+                row_y += 44
 
-        # 3-day forecast strip
+        # ── Forecast strip ───────────────────────────────────────────
+        draw.line([(20, 322), (width - 20, 322)], fill=C_BLACK, width=2)
+
         col_w = width // 3
         for i in range(1, 4):
             date_str = daily["time"][i]
@@ -275,13 +300,13 @@ def display_weather():
             col_x = (i - 1) * col_w
             mid = col_x + col_w // 2
 
-            col_centered_text(day_name, font_day, 330, mid)
-            draw_icon(draw, mid, 372, 58, day_code)
-            col_centered_text(f"{hi}° / {lo}°", font_hilo, 404, mid)
-            col_centered_text(f"Rain: {rain_pct}%", font_rain, 428, mid)
+            col_centered_text(day_name, font_day, 326, mid)
+            draw_icon(draw, mid, 368, 56, day_code)
+            col_centered_text(f"{hi}° / {lo}°", font_hilo, 400, mid)
+            col_centered_text(f"Rain: {rain_pct}%", font_rain, 424, mid)
 
             if i < 3:
-                draw.line([(col_x + col_w, 328), (col_x + col_w, height - 8)],
+                draw.line([(col_x + col_w, 324), (col_x + col_w, height - 8)],
                           fill=C_BLACK, width=1)
 
         inky.set_image(image)
