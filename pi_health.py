@@ -74,10 +74,11 @@ def display_pi_health():
             label_h = lh[3] - lh[1]
             value_h = vh[3] - vh[1]
             gap = 6
+            sub_gap = 18
             block_h = label_h + gap + value_h
             if sub:
                 sh = draw.textbbox((0, 0), sub, font=font_sub)
-                block_h += gap + (sh[3] - sh[1])
+                block_h += sub_gap + (sh[3] - sh[1])
 
             # Vertical start to centre block in quadrant
             ty = qy + (row_h - block_h) // 2
@@ -91,7 +92,7 @@ def display_pi_health():
             ty += label_h + gap
             draw_centred(value, font_value, ty)
             if sub:
-                ty += value_h + gap
+                ty += value_h + sub_gap
                 draw_centred(sub, font_sub, ty)
 
         draw_cell("CPU Temp",  temp_str, None,    col=0, row=0)
