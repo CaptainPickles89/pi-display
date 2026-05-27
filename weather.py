@@ -304,8 +304,7 @@ def display_weather():
 
             col_centered_text(day_name, font_day, 326, mid)
             draw_icon(draw, mid, 368, 56, day_code)
-            col_centered_text(f"{hi}° / {lo}°", font_hilo, 400, mid)
-            col_centered_text(f"Rain: {rain_pct}%", font_rain, 424, mid)
+            col_centered_text(f"{hi}°", font_hilo, 402, mid)
 
             if i < 3:
                 draw.line([(col_x + col_w, 324), (col_x + col_w, height - 8)],
