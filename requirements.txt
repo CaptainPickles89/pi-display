@@ -5,3 +5,4 @@ Pillow==11.0.0
 Requests==2.32.3
 yfinance==0.2.51
 psutil>=5.9.0
+speedtest-cli>=2.1.3

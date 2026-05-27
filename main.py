@@ -13,6 +13,7 @@ from birthdays import check_birthdays
 from date_display import get_date
 from weather import display_weather
 from pi_health import display_pi_health
+from speedtest_display import display_speedtest
 from gpiozero import Button
 from inky.auto import auto
 
@@ -90,6 +91,7 @@ def main():
             lambda: get_date(),
             lambda: display_weather(),
             lambda: display_pi_health(),
+            lambda: display_speedtest(),
         ]
 
         current_index = 0
