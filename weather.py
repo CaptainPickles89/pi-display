@@ -305,7 +305,7 @@ def display_weather():
             col_centered_text(day_name, font_day, 326, mid)
             # Icon left of centre, temp right of icon — same line
             icon_x = col_x + 62
-            temp_x = col_x + 108
+            temp_x = col_x + 120
             draw_icon(draw, icon_x, 378, 52, day_code)
             draw.text((temp_x, 362), f"{hi}°", font=font_hilo, fill=C_BLACK)
 
