@@ -261,29 +261,31 @@ def display_weather():
 
         # Info panel — right side starting at x=310
         info_x = 310
-        info_rows = [
-            (condition,                   None),
-            (f"{hi_today}° / {lo_today}°", "High / Low"),
-            (f"{wind} km/h",              "Wind"),
-            (f"{precip} mm",              "Rain"),
-            (f"☀ {sunrise}",          "Sunrise"),
-            (f"☽ {sunset}",           "Sunset"),
-        ]
+        info_x2 = 455  # second column for paired rows
+        grey = (100, 100, 100)
+
+        def info_row(label, value, x, y):
+            draw.text((x, y), label, font=font_info_label, fill=grey)
+            draw.text((x, y + 22), value, font=font_info_val, fill=C_BLACK)
 
         row_y = 66
-        row_gap = 40
-        for value, label in info_rows:
-            if label:
-                draw.text((info_x, row_y), label, font=font_info_label,
-                          fill=(100, 100, 100))
-                draw.text((info_x, row_y + 20), value, font=font_info_val,
-                          fill=C_BLACK)
-                row_y += row_gap + 18
-            else:
-                # Condition — no label, larger
-                draw.text((info_x, row_y), value, font=font_condition,
-                          fill=C_BLACK)
-                row_y += 44
+
+        # Condition — full width, no label
+        draw.text((info_x, row_y), condition, font=font_condition, fill=C_BLACK)
+        row_y += 42
+
+        # High / Low — full width
+        info_row("High / Low", f"{hi_today}° / {lo_today}°", info_x, row_y)
+        row_y += 58
+
+        # Wind + Rain — side by side
+        info_row("Wind", f"{wind} km/h", info_x, row_y)
+        info_row("Rain", f"{precip} mm", info_x2, row_y)
+        row_y += 58
+
+        # Sunrise + Sunset — side by side
+        info_row("Sunrise", sunrise, info_x, row_y)
+        info_row("Sunset", sunset, info_x2, row_y)
 
         # ── Forecast strip ───────────────────────────────────────────
         draw.line([(20, 322), (width - 20, 322)], fill=C_BLACK, width=2)
