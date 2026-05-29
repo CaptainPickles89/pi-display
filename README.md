@@ -54,10 +54,12 @@ This script will take images from the location of __image_dir__ set within the _
 
 ## Stocks
 
-This will generate a close price graph of the last 3 months for a given stock (via Yahoo finance), change the stock you wish to see by changing the stock symbol under display_functions in main.py:
+This will generate a close price graph of the last 6 months for a given stock (via Yahoo finance), change the stock you wish to see by changing the stock symbol under display_functions in main.py:
 ```python
-lambda: get_stock("IGG.L")
+partial(fetch_and_display_stock, "IGG.L")
 ```
+
+Stock data is cached and refreshed once per day. The cache is considered stale after 09:00 UTC, regardless of your local timezone.
 Example Output:
 
 ![IGG.L Stock Example](/docs/stock_example.png)

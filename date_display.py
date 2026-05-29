@@ -1,4 +1,3 @@
-import requests
 from PIL import Image, ImageDraw, ImageFont
 import datetime
 from inky.auto import auto
@@ -35,21 +34,21 @@ def get_date():
         text_spacing = 15  # Spacing between lines
 
         # Draw first line (centered horizontally)
-        text_width, text_height = draw.textsize(line1, font=text_font)
-        x_position = (display_width - text_width) // 2
+        b1 = draw.textbbox((0, 0), line1, font=text_font)
+        x_position = (display_width - (b1[2] - b1[0])) // 2
         y_position = 90
         draw.text((x_position, y_position), line1, font=text_font, fill="black")
 
         # Draw second line with larger font (centered horizontally)
-        text_width, text_height = draw.textsize(line2, font=num_font)
-        x_position = (display_width - text_width) // 2
-        y_position += text_font.getsize(line1)[1] + text_spacing
+        b2 = draw.textbbox((0, 0), line2, font=num_font)
+        x_position = (display_width - (b2[2] - b2[0])) // 2
+        y_position += (b1[3] - b1[1]) + text_spacing
         draw.text((x_position, y_position), line2, font=num_font, fill="black")
 
         # Draw third line (centered horizontally)
-        text_width, text_height = draw.textsize(line3, font=text_font)
-        x_position = (display_width - text_width) // 2
-        y_position += num_font.getsize(line2)[1] + text_spacing
+        b3 = draw.textbbox((0, 0), line3, font=text_font)
+        x_position = (display_width - (b3[2] - b3[0])) // 2
+        y_position += (b2[3] - b2[1]) + text_spacing
         draw.text((x_position, y_position), line3, font=text_font, fill="black")
 
         inky.set_image(img)

@@ -3,8 +3,7 @@ import random
 import logging
 import time
 import sys
-import traceback
-import subprocess
+from functools import partial
 from logging.handlers import RotatingFileHandler
 from apod import display_apod
 from stocks import fetch_and_display_stock
@@ -14,12 +13,9 @@ from date_display import get_date
 from weather import display_weather
 from pi_health import display_pi_health
 from speedtest_display import display_speedtest
+from image import display_image as show_image
+from clear import run_clear
 from gpiozero import Button
-from inky.auto import auto
-
-# Initialize the Inky Impression
-inky_display = auto()
-inky_display.set_border(inky_display.WHITE)
 
 # Button setup
 button_a = Button(5)
@@ -42,40 +38,26 @@ logger.setLevel(logging.DEBUG)
 logger.addHandler(handler)
 
 
-def log_error(message):
-    try:
-        # Logs error messages to specified file
-        with open(LOG_FILE, "a") as log_file:
-            log_file.write(f"{time.strftime('%d-%m-%Y %H:%M:%S')} - {message}\n")
-            log_file.flush()
-    except Exception as e:
-        print(f"Failed to log error {e}")
-
-
-# Clear the e-ink screen
 def screen_clear():
     try:
-        subprocess.run(["python3", "clear.py"])
-        return 0  # success
+        run_clear()
+        return 0
     except Exception as e:
-        print(f"Failed to clear display: {e}")
-        log_error(f"Failed to clear display: {e}")
-        return 1  # failure
+        logger.error(f"Failed to clear display: {e}", exc_info=True)
+        return 1
 
 
-# Display an image
 def display_image(image_path):
     try:
         print(f"Now loading {image_path} to display")
-        subprocess.run(["python3", "image.py", image_path])
+        show_image(image_path)
     except Exception as e:
-        print(f"Failed to display image: {e}")
-        log_error(f"Failed to display image: {e}")
+        logger.error(f"Failed to display image: {e}", exc_info=True)
 
 
 # Main loop
 def main():
-    logger.info(f"Starting main loop")
+    logger.info("Starting main loop")
     try:
         image_files = [
             os.path.join(image_dir, f)
@@ -83,15 +65,15 @@ def main():
             if f.endswith((".png", ".jpg", ".jpeg"))
         ]
         display_functions = [
-            lambda: show_pihole_stats(),
+            show_pihole_stats,
             lambda: display_image(random.choice(image_files)),
-            lambda: fetch_and_display_stock("IGG.L"),
-            lambda: display_apod(),
-            lambda: check_birthdays(),
-            lambda: get_date(),
-            lambda: display_weather(),
-            lambda: display_pi_health(),
-            lambda: display_speedtest(),
+            partial(fetch_and_display_stock, "IGG.L"),
+            display_apod,
+            check_birthdays,
+            get_date,
+            display_weather,
+            display_pi_health,
+            display_speedtest,
         ]
 
         current_index = 0
@@ -100,11 +82,7 @@ def main():
             try:
                 print(f"Calling index {current_index}")
                 print(f"Display function {display_functions[current_index]}")
-                if display_functions[current_index]:
-                    display_functions[current_index]()
-                else:
-                    print(f"Error: Function at index {current_index} is None")
-                    log_error(f"Error: Function at index {current_index} is None")
+                display_functions[current_index]()
 
                 # Wait for 20 minutes or button press
                 start_time = time.time()
@@ -124,29 +102,20 @@ def main():
 
                 current_index = (current_index + 1) % len(display_functions)
             except Exception as e:
-                log_error(f"Error during display function: {e}")
-                log_error(traceback.format_exc())
+                logger.error(f"Error during display function: {e}", exc_info=True)
                 current_index = (current_index + 1) % len(display_functions)
 
-    except Exception as e:
-        # Log the final error and re-raise it to stop the script
-        logger.error(f"Fatal error in main loop: {e}", exc_info=True)
-        log_error(traceback.format_exc())
-        sys.exit(1)
-        raise
-
     except KeyboardInterrupt:
-        logger.info("Process intterupted by user")
+        logger.info("Process interrupted by user")
         sys.exit(0)
+
+    except Exception as e:
+        logger.critical(f"Fatal error in main loop: {e}", exc_info=True)
+        sys.exit(1)
 
     finally:
         logger.info("Process Exiting")
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        log_error(f"Unhandled exception: {e}")
-        log_error(traceback.format_exc())
-        logger.critical(f"Fatal Error: {e}", exc_info=True)
+    main()

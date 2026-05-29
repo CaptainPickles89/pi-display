@@ -29,7 +29,7 @@ def save_cache(cache):
 
 
 def is_new_market_day(last_fetch_ts):
-    """Return True if the last fetch was before today 09:00 UK time."""
+    """Return True if the last fetch was before today 09:00 UTC."""
     now_utc = datetime.now(timezone.utc)
     today_9am_utc = datetime(year=now_utc.year, month=now_utc.month,
                              day=now_utc.day, hour=9, tzinfo=timezone.utc)

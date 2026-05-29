@@ -21,12 +21,15 @@ def load_api_key():
 def fetch_apod():
     # Grab API Key
     api_key = load_api_key()
+    if api_key is None:
+        print("Error: APOD API key missing, cannot fetch.")
+        return None
 
     # Fetch the Astronomy Picture of the Day (APOD) from NASA API.
     url = f"https://api.nasa.gov/planetary/apod?api_key={api_key}"
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=10)
         response.raise_for_status()
         data = response.json()
 
@@ -38,7 +41,7 @@ def fetch_apod():
         # Fetch the image
         image_url = data["url"]
         image_title = data["title"]
-        image_response = requests.get(image_url)
+        image_response = requests.get(image_url, timeout=10)
         image_response.raise_for_status()
 
         # load() forces full decode into memory; copy() detaches from the buffer
