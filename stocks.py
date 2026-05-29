@@ -104,11 +104,10 @@ def fetch_stock(symbol):
 
 
 # ----------------- Display Utilities -----------------
-def display_stock_graph(graph_path):
-    """Display the stock graph on the Inky display."""
+def display_stock_graph(buf):
     inky = auto()
     saturation = 0.5
-    with Image.open(graph_path) as img:
+    with Image.open(buf) as img:
         resizedimage = img.resize(inky.resolution)
         try:
             inky.set_image(resizedimage, saturation=saturation)
@@ -148,11 +147,11 @@ def fetch_and_display_stock(symbol):
     plt.grid(True)
     plt.legend()
 
-    # Save and display
-    graph_path = "/tmp/stock_graph.png"
-    plt.savefig(graph_path, bbox_inches="tight")
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png", bbox_inches="tight")
     plt.close()
-    display_stock_graph(graph_path)
+    buf.seek(0)
+    display_stock_graph(buf)
 
 
 # ----------------- CLI Entry Point -----------------
