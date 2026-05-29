@@ -8,7 +8,7 @@ from PIL import Image, ImageDraw, ImageFont
 from inky.auto import auto
 
 FONT_PATH = "./resources/fonts/Roboto-Medium.ttf"
-HISTORY_FILE = os.path.join(os.path.expanduser("~"), ".speedtest_history.json")
+HISTORY_FILE = "/home/danny/.speedtest_history.json"
 
 STATS_HEIGHT = 158  # px reserved for header + stats before graph
 

@@ -3,7 +3,7 @@ import os
 import speedtest
 from datetime import datetime
 
-HISTORY_FILE = os.path.join(os.path.expanduser("~"), ".speedtest_history.json")
+HISTORY_FILE = "/home/danny/.speedtest_history.json"
 MAX_ENTRIES = 60  # 30 days of twice-daily results
 
 
