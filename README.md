@@ -120,21 +120,21 @@ Shows the latest download speed, upload speed, and ping, along with a trend grap
 
 ### Setup
 
-**1. Install the dependency:**
+**1. Install the dependency into your virtual environment:**
 ```bash
-pip install speedtest-cli
+/home/danny/.virtualenvs/pimoroni/bin/pip install speedtest-cli
 ```
 
 **2. Add cron jobs to run the speedtest at midnight and noon** (`crontab -e`):
 ```
-0 0  * * * /usr/bin/python3 /home/danny/pi-display/speedtest_runner.py
-0 12 * * * /usr/bin/python3 /home/danny/pi-display/speedtest_runner.py
+0 0  * * * /home/danny/.virtualenvs/pimoroni/bin/python3 /home/danny/Documents/git/pi-display/speedtest_runner.py >> /home/danny/speedtest_cron.log 2>&1
+0 12 * * * /home/danny/.virtualenvs/pimoroni/bin/python3 /home/danny/Documents/git/pi-display/speedtest_runner.py >> /home/danny/speedtest_cron.log 2>&1
 ```
-Adjust the path to match your install location. If using a virtual environment, replace `/usr/bin/python3` with the path to your venv Python binary (e.g. `/home/danny/pi-display/eink_display_venv/bin/python3`).
+The log file at `~/speedtest_cron.log` captures any errors for troubleshooting.
 
 **3. Seed your first result** so the display has data straight away:
 ```bash
-python3 speedtest_runner.py
+/home/danny/.virtualenvs/pimoroni/bin/python3 /home/danny/Documents/git/pi-display/speedtest_runner.py
 ```
 
 Results are stored in __~/.speedtest_history.json__ (up to 60 entries, ~30 days). The display will show a "no data yet" message until the first run completes.

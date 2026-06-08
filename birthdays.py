@@ -5,7 +5,7 @@ import json
 import sys
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
-from inky.auto import auto
+from display import get_display
 
 
 def read_birthdays(file_path):
@@ -39,7 +39,7 @@ def check_birthdays():
 
     if birthday_matches:
         print("There are birthdays today!")
-        inky = auto()
+        inky = get_display()
         with Image.open("./resources/imgs/birthday-bg1-01.png") as img:
             draw = ImageDraw.Draw(img)
 

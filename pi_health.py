@@ -1,6 +1,6 @@
 import psutil
 from PIL import Image, ImageDraw, ImageFont
-from inky.auto import auto
+from display import get_display
 from datetime import datetime
 
 FONT_PATH = "./resources/fonts/Roboto-Medium.ttf"
@@ -21,7 +21,7 @@ def fmt_bytes(b):
 
 def display_pi_health():
     try:
-        inky = auto()
+        inky = get_display()
         width, height = inky.resolution
 
         image = Image.new("RGB", (width, height), "white")

@@ -1,6 +1,6 @@
 import requests
 from PIL import Image, ImageDraw, ImageFont
-from inky.auto import auto
+from display import get_display
 
 
 def get_sid(api_url, password):
@@ -49,7 +49,7 @@ def load_password():
 
 
 def display_pihole_stats(stats):
-    inky = auto()
+    inky = get_display()
     with Image.open("./resources/imgs/pihole-bg1-01.png") as img:
         draw = ImageDraw.Draw(img)
 

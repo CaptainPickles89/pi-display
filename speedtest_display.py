@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
-from inky.auto import auto
+from display import get_display
 
 FONT_PATH = "./resources/fonts/Roboto-Medium.ttf"
 HISTORY_FILE = "/home/danny/.speedtest_history.json"
@@ -27,7 +27,7 @@ def display_speedtest():
     history = load_history()
 
     try:
-        inky = auto()
+        inky = get_display()
         width, height = inky.resolution
 
         image = Image.new("RGB", (width, height), "white")

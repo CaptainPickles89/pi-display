@@ -5,11 +5,11 @@ import warnings
 
 from PIL import Image
 
-from inky.auto import auto
+from display import get_display
 
 
 def display_image(image_path):
-    inky = auto()
+    inky = get_display()
     saturation = 0.5
     with Image.open(image_path) as image:
         resizedimage = image.resize(inky.resolution)

@@ -9,7 +9,7 @@ import yfinance as yf
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from PIL import Image
-from inky.auto import auto
+from display import get_display
 
 CACHE_FILE = os.path.join(os.path.expanduser("~"), ".stock_cache.json")
 
@@ -105,7 +105,7 @@ def fetch_stock(symbol):
 
 # ----------------- Display Utilities -----------------
 def display_stock_graph(buf):
-    inky = auto()
+    inky = get_display()
     saturation = 0.5
     with Image.open(buf) as img:
         resizedimage = img.resize(inky.resolution)

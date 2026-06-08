@@ -1,12 +1,12 @@
 from PIL import Image, ImageDraw, ImageFont
 import datetime
-from inky.auto import auto
+from display import get_display
 
 
 def get_date():
 
     # Prepare the display
-    inky = auto()
+    inky = get_display()
     with Image.open("./resources/imgs/Date-bg1-01.png") as img:
         img = img.resize(inky.resolution)
         draw = ImageDraw.Draw(img)

@@ -5,11 +5,11 @@ import argparse
 import time
 
 from PIL import Image
-from inky.auto import auto
+from display import get_display
 
 
 def run_clear(cycles=3):
-    inky_display = auto()
+    inky_display = get_display()
     colours = (inky_display.RED, inky_display.BLACK, inky_display.WHITE)
     colour_names = (inky_display.colour, "black", "white")
 

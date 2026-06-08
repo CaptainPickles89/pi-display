@@ -2,7 +2,7 @@ import requests
 import traceback
 from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 from io import BytesIO
-from inky.auto import auto
+from display import get_display
 
 
 def load_api_key():
@@ -58,7 +58,7 @@ def display_apod():
 
     # Fetch and display the APOD image on the Inky display.
 
-    inky_display = auto()
+    inky_display = get_display()
     inky_display.set_border(inky_display.BLACK)
 
     try:
