@@ -377,12 +377,14 @@ def display_weather():
         draw.line([(20, 322), (width - 20, 322)], fill=C_BLACK, width=2)
 
         future_dates = sorted(d for d in groups if d > today_str)[:3]
+        n = len(future_dates)
         col_w = width // 3
+        start_x = (width - n * col_w) // 2
 
         for i, date_str in enumerate(future_dates):
             summary = _day_summary(date_str, groups[date_str])
             day_name = DAY_NAMES[datetime.strptime(date_str, "%Y-%m-%d").weekday()]
-            col_x = i * col_w
+            col_x = start_x + i * col_w
             mid = col_x + col_w // 2
 
             col_centered_text(day_name, font_day, 326, mid)
@@ -390,7 +392,7 @@ def display_weather():
             draw.text((col_x + 120, 362), f"{round(summary['maxTemp'])}°",
                       font=font_hilo, fill=C_BLACK)
 
-            if i < 2:
+            if i < n - 1:
                 draw.line([(col_x + col_w, 324), (col_x + col_w, height - 8)],
                           fill=C_BLACK, width=1)
 
