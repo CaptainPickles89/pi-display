@@ -1,5 +1,6 @@
 import json
 import os
+import traceback
 import speedtest
 from datetime import datetime
 
@@ -17,6 +18,7 @@ def run():
         ping_ms = round(st.results.ping, 1)
     except Exception as e:
         print(f"Speedtest failed: {e}")
+        traceback.print_exc()
         return
 
     entry = {
