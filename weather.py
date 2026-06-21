@@ -1,37 +1,51 @@
+import json
 import math
+import os
 import requests
 from PIL import Image, ImageDraw, ImageFont
 from display import get_display
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 FONT_PATH = "./resources/fonts/Roboto-Medium.ttf"
 CREDS_PATH = "./creds/weather-location.txt"
+API_KEY_PATH = "./creds/metoffice-api.txt"
+CACHE_FILE = "/tmp/weather_cache.json"
+CACHE_TTL_HOURS = 3
 
-WMO_CODES = {
-    0: "Clear Sky",
-    1: "Mainly Clear",
-    2: "Partly Cloudy",
-    3: "Overcast",
-    45: "Foggy",
-    48: "Icy Fog",
-    51: "Light Drizzle",
-    53: "Drizzle",
-    55: "Heavy Drizzle",
-    61: "Light Rain",
-    63: "Rain",
-    65: "Heavy Rain",
-    71: "Light Snow",
-    73: "Snow",
-    75: "Heavy Snow",
-    77: "Snow Grains",
-    80: "Light Showers",
-    81: "Showers",
-    82: "Heavy Showers",
-    85: "Snow Showers",
-    86: "Heavy Snow Showers",
-    95: "Thunderstorm",
-    96: "Thunderstorm + Hail",
-    99: "Thunderstorm + Hail",
+HOURLY_URL = "https://data.hub.api.metoffice.gov.uk/sitespecific/v0/point/hourly"
+SUNRISE_URL = "https://api.sunrise-sunset.org/json"
+
+MET_CODES = {
+    0:  "Clear Night",
+    1:  "Sunny",
+    2:  "Partly Cloudy",
+    3:  "Partly Cloudy",
+    5:  "Mist",
+    6:  "Fog",
+    7:  "Cloudy",
+    8:  "Overcast",
+    9:  "Light Shower",
+    10: "Light Shower",
+    11: "Drizzle",
+    12: "Light Rain",
+    13: "Heavy Shower",
+    14: "Heavy Shower",
+    15: "Heavy Rain",
+    16: "Sleet Shower",
+    17: "Sleet Shower",
+    18: "Sleet",
+    19: "Hail Shower",
+    20: "Hail Shower",
+    21: "Hail",
+    22: "Snow Shower",
+    23: "Snow Shower",
+    24: "Light Snow",
+    25: "Heavy Snow Shower",
+    26: "Heavy Snow Shower",
+    27: "Heavy Snow",
+    28: "Thunder Shower",
+    29: "Thunder Shower",
+    30: "Thunder",
 }
 
 DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
@@ -132,19 +146,19 @@ def _fog_lines(draw, cx, cy, size):
 
 
 def _icon_group(code):
-    if code == 0:
+    if code in (0, 1):
         return "sun"
-    if code in (1, 2):
+    if code in (2, 3):
         return "sun_cloud"
-    if code == 3:
-        return "cloud"
-    if code in (45, 48):
+    if code in (5, 6):
         return "fog"
-    if code in (51, 53, 55, 61, 63, 65, 80, 81, 82):
+    if code in (7, 8):
+        return "cloud"
+    if 9 <= code <= 21:
         return "rain"
-    if code in (71, 73, 75, 77, 85, 86):
+    if code in (22, 23, 24, 25, 26, 27):
         return "snow"
-    if code in (95, 96, 99):
+    if code in (28, 29, 30):
         return "storm"
     return "cloud"
 
@@ -174,19 +188,102 @@ def draw_icon(draw, cx, cy, size, code):
         _lightning(draw, cx, precip_cy, size)
 
 
+# --- Helpers ---
+
+def _get_current_hourly(time_series):
+    now = datetime.now(timezone.utc)
+    current = time_series[0]
+    for entry in time_series:
+        t = datetime.fromisoformat(entry["time"].replace("Z", "+00:00"))
+        if t <= now:
+            current = entry
+        else:
+            break
+    return current
+
+
+def _parse_utc(dt_str):
+    dt = datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
+    return dt.astimezone().strftime("%H:%M")
+
+
+def _group_by_date(time_series):
+    groups = {}
+    for entry in time_series:
+        d = entry["time"][:10]
+        groups.setdefault(d, []).append(entry)
+    return groups
+
+
+def _day_summary(date_str, entries):
+    temps = [e["screenTemperature"] for e in entries if "screenTemperature" in e]
+    noon = next((e for e in entries if "T12:" in e["time"]),
+                entries[len(entries) // 2])
+    return {
+        "date": date_str,
+        "maxTemp": max(temps) if temps else 0,
+        "minTemp": min(temps) if temps else 0,
+        "code": noon.get("significantWeatherCode", 7),
+    }
+
+
+# --- Cache ---
+
+def _load_cache():
+    if not os.path.exists(CACHE_FILE):
+        return None
+    try:
+        with open(CACHE_FILE) as f:
+            cache = json.load(f)
+        fetched_at = datetime.fromisoformat(cache["fetched_at"])
+        if datetime.now(timezone.utc) - fetched_at < timedelta(hours=CACHE_TTL_HOURS):
+            return cache["hourly_ts"], cache["sun"]
+    except Exception:
+        pass
+    return None
+
+
+def _save_cache(hourly_ts, sun):
+    try:
+        with open(CACHE_FILE, "w") as f:
+            json.dump({
+                "fetched_at": datetime.now(timezone.utc).isoformat(),
+                "hourly_ts": hourly_ts,
+                "sun": sun,
+            }, f)
+    except Exception:
+        pass
+
+
 # --- Data fetch ---
 
-def fetch_weather(lat, lon):
-    url = (
-        "https://api.open-meteo.com/v1/forecast"
-        f"?latitude={lat}&longitude={lon}"
-        "&current=temperature_2m,weathercode,windspeed_10m,precipitation"
-        "&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode,sunrise,sunset"
-        "&timezone=auto&forecast_days=4"
-    )
-    resp = requests.get(url, timeout=10)
-    resp.raise_for_status()
-    return resp.json()
+def fetch_weather(lat, lon, api_key):
+    cached = _load_cache()
+    if cached:
+        return cached
+
+    headers = {"apikey": api_key, "accept": "application/json"}
+    params = {"latitude": lat, "longitude": lon, "includeLocationName": "false"}
+    hourly_resp = requests.get(HOURLY_URL, headers=headers, params=params, timeout=10)
+    hourly_resp.raise_for_status()
+    hourly_ts = hourly_resp.json()["features"][0]["properties"]["timeSeries"]
+
+    sun = {"sunrise": "N/A", "sunset": "N/A"}
+    try:
+        sr = requests.get(SUNRISE_URL,
+                          params={"lat": lat, "lng": lon, "formatted": 0},
+                          timeout=5)
+        if sr.ok:
+            r = sr.json()["results"]
+            sun = {
+                "sunrise": _parse_utc(r["sunrise"]),
+                "sunset": _parse_utc(r["sunset"]),
+            }
+    except Exception:
+        pass
+
+    _save_cache(hourly_ts, sun)
+    return hourly_ts, sun
 
 
 # --- Display ---
@@ -195,12 +292,14 @@ def display_weather():
     try:
         with open(CREDS_PATH) as f:
             lat, lon = f.read().strip().split(",")
+        with open(API_KEY_PATH) as f:
+            api_key = f.read().strip()
     except Exception as e:
-        print(f"Weather: failed to read location: {e}")
+        print(f"Weather: failed to read credentials: {e}")
         return
 
     try:
-        data = fetch_weather(lat.strip(), lon.strip())
+        hourly_ts, sun = fetch_weather(lat.strip(), lon.strip(), api_key)
     except Exception as e:
         print(f"Weather: fetch failed: {e}")
         return
@@ -219,24 +318,25 @@ def display_weather():
         font_condition = ImageFont.truetype(FONT_PATH, 32)
         font_day = ImageFont.truetype(FONT_PATH, 23)
         font_hilo = ImageFont.truetype(FONT_PATH, 24)
-        font_rain = ImageFont.truetype(FONT_PATH, 20)
 
-        current = data["current"]
-        daily = data["daily"]
+        grey = (100, 100, 100)
 
-        temp_c = round(current["temperature_2m"])
-        code = current["weathercode"]
-        wind = round(current["windspeed_10m"])
-        precip = current["precipitation"]
-        condition = WMO_CODES.get(code, "Unknown")
-        hi_today = round(daily["temperature_2m_max"][0])
-        lo_today = round(daily["temperature_2m_min"][0])
+        current = _get_current_hourly(hourly_ts)
+        today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        groups = _group_by_date(hourly_ts)
 
-        def parse_time(dt_str):
-            return datetime.strptime(dt_str, "%Y-%m-%dT%H:%M").strftime("%H:%M")
+        today_temps = [e["screenTemperature"] for e in groups.get(today_str, [])
+                       if "screenTemperature" in e]
+        hi_today = round(max(today_temps)) if today_temps else round(current["screenTemperature"])
+        lo_today = round(min(today_temps)) if today_temps else round(current["screenTemperature"])
 
-        sunrise = parse_time(daily["sunrise"][0])
-        sunset = parse_time(daily["sunset"][0])
+        temp_c = round(current["screenTemperature"])
+        code = current["significantWeatherCode"]
+        wind_kmh = round(current["windSpeed10m"] * 3.6)
+        precip = round(current.get("totalPrecipAmount", 0.0), 1)
+        condition = MET_CODES.get(code, "Unknown")
+        sunrise = sun["sunrise"]
+        sunset = sun["sunset"]
 
         def col_centered_text(text, font, y, col_mid, fill=C_BLACK):
             b = draw.textbbox((0, 0), text, font=font)
@@ -252,64 +352,45 @@ def display_weather():
         draw.line([(20, 58), (width - 20, 58)], fill=C_BLACK, width=2)
 
         # ── Main section: icon left, info right ──────────────────────
-        icon_cx = 148
-        icon_cy = 188
-        draw_icon(draw, icon_cx, icon_cy, 200, code)
-
-        # Vertical divider between icon and info panel
+        draw_icon(draw, 148, 188, 200, code)
         draw.line([(296, 64), (296, 318)], fill=C_BLACK, width=1)
 
-        # Info panel — right side starting at x=310
         info_x = 310
-        info_x2 = 455  # second column for paired rows
-        grey = (100, 100, 100)
+        info_x2 = 455
 
         def info_row(label, value, x, y):
             draw.text((x, y), label, font=font_info_label, fill=grey)
             draw.text((x, y + 22), value, font=font_info_val, fill=C_BLACK)
 
         row_y = 66
-
-        # Condition — full width, no label
         draw.text((info_x, row_y), condition, font=font_condition, fill=C_BLACK)
         row_y += 42
-
-        # High / Low — full width
         info_row("High / Low", f"{hi_today}° / {lo_today}°", info_x, row_y)
         row_y += 58
-
-        # Wind + Rain — side by side
-        info_row("Wind", f"{wind} km/h", info_x, row_y)
+        info_row("Wind", f"{wind_kmh} km/h", info_x, row_y)
         info_row("Rain", f"{precip} mm", info_x2, row_y)
         row_y += 58
-
-        # Sunrise + Sunset — side by side
         info_row("Sunrise", sunrise, info_x, row_y)
         info_row("Sunset", sunset, info_x2, row_y)
 
         # ── Forecast strip ───────────────────────────────────────────
         draw.line([(20, 322), (width - 20, 322)], fill=C_BLACK, width=2)
 
+        future_dates = sorted(d for d in groups if d > today_str)[:3]
         col_w = width // 3
-        for i in range(1, 4):
-            date_str = daily["time"][i]
-            day_name = DAY_NAMES[datetime.strptime(date_str, "%Y-%m-%d").weekday()]
-            hi = round(daily["temperature_2m_max"][i])
-            lo = round(daily["temperature_2m_min"][i])
-            rain_pct = daily["precipitation_probability_max"][i]
-            day_code = daily["weathercode"][i]
 
-            col_x = (i - 1) * col_w
+        for i, date_str in enumerate(future_dates):
+            summary = _day_summary(date_str, groups[date_str])
+            day_name = DAY_NAMES[datetime.strptime(date_str, "%Y-%m-%d").weekday()]
+            col_x = i * col_w
             mid = col_x + col_w // 2
 
             col_centered_text(day_name, font_day, 326, mid)
-            # Icon left of centre, temp right of icon — same line
-            icon_x = col_x + 62
-            temp_x = col_x + 120
-            draw_icon(draw, icon_x, 378, 52, day_code)
-            draw.text((temp_x, 362), f"{hi}°", font=font_hilo, fill=C_BLACK)
+            draw_icon(draw, col_x + 62, 378, 52, summary["code"])
+            draw.text((col_x + 120, 362), f"{round(summary['maxTemp'])}°",
+                      font=font_hilo, fill=C_BLACK)
 
-            if i < 3:
+            if i < 2:
                 draw.line([(col_x + col_w, 324), (col_x + col_w, height - 8)],
                           fill=C_BLACK, width=1)
 

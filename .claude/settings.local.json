@@ -7,7 +7,13 @@
       "Bash(ulimit -n)",
       "Bash(pip3 show *)",
       "Bash(python3 -m py_compile weather.py)",
-      "Bash(grep -ln \"= auto\\(\\)\" image.py stocks.py pihole.py birthdays.py date_display.py apod.py pi_health.py speedtest_display.py clear.py weather.py)"
+      "Bash(grep -ln \"= auto\\(\\)\" image.py stocks.py pihole.py birthdays.py date_display.py apod.py pi_health.py speedtest_display.py clear.py weather.py)",
+      "WebFetch(domain:api.open-meteo.com)",
+      "WebFetch(domain:datahub.metoffice.gov.uk)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(gh api *)",
+      "Bash(python3 -m json.tool)",
+      "WebFetch(domain:github.com)"
     ]
   }
 }
