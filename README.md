@@ -111,6 +111,7 @@ To configure your location, create a file at __creds/weather-location.txt__ cont
 ```
 
 Example Output:
+
 ![weather_example](/docs/weather_example.png)
 
 ## Pi Health
@@ -118,6 +119,7 @@ Example Output:
 Displays a live snapshot of the Raspberry Pi's system stats: CPU temperature, CPU usage %, RAM usage, and disk usage. No external API or credentials required.
 
 Example Output:
+
 ![Pi_Health_Example](/docs/pi_health_preview.png)
 
 ## Speedtest

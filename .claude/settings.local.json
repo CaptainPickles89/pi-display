@@ -13,7 +13,9 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(gh api *)",
       "Bash(python3 -m json.tool)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(python3 -m py_compile main.py)",
+      "Bash(python3 *)"
     ]
   }
 }

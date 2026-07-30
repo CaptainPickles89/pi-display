@@ -3,6 +3,7 @@ import random
 import logging
 import time
 import sys
+import threading
 from functools import partial
 from logging.handlers import RotatingFileHandler
 from apod import display_apod
@@ -16,12 +17,6 @@ from speedtest_display import display_speedtest
 from image import display_image as show_image
 from clear import run_clear
 from gpiozero import Button
-
-# Button setup
-button_a = Button(5)
-button_b = Button(6)
-button_c = Button(16)
-button_d = Button(24)
 
 # Paths
 image_dir = "/home/danny/Pictures"  # Change to your image directory
@@ -37,16 +32,33 @@ logger = logging.getLogger("display_logger")
 logger.setLevel(logging.DEBUG)
 logger.addHandler(handler)
 
+# Create reusable event
+wake_event = threading.Event()
 
+# Lock threads to only allow one to use the display at a time
+display_lock = threading.Lock()
+
+# Button setup
+button_a = Button(5)
+button_b = Button(6)
+button_c = Button(16)
+button_d = Button(24)
+
+# CLear the screen of any image
 def screen_clear():
+    if not display_lock.acquire(blocking=False):
+        logger.info("Display busy, ignoring button D")
+        return
     try:
         run_clear()
         return 0
     except Exception as e:
         logger.error(f"Failed to clear display: {e}", exc_info=True)
         return 1
+    finally:
+        display_lock.release()
 
-
+# Show a random picture on the display
 def display_image(image_path):
     try:
         print(f"Now loading {image_path} to display")
@@ -54,16 +66,34 @@ def display_image(image_path):
     except Exception as e:
         logger.error(f"Failed to display image: {e}", exc_info=True)
 
+# Load images in image dir
+image_files = [
+            os.path.join(image_dir, f)
+            for f in os.listdir(image_dir)
+            if f.endswith((".png", ".jpg", ".jpeg"))
+        ]
+
+# Skip to the next entry in the loop
+def skip_next():
+    logger.info("Skipping to next index")
+    wake_event.set()
+
+# Skip to showing an image
+def skip_to_image():
+    if not display_lock.acquire(blocking=False):
+        logger.info("Display busy, ignoring button B")
+        return
+    try:
+        logger.info("Skipping to display image")
+        display_image(random.choice(image_files))
+    finally:
+        display_lock.release()
+    wake_event.set()
 
 # Main loop
 def main():
     logger.info("Starting main loop")
     try:
-        image_files = [
-            os.path.join(image_dir, f)
-            for f in os.listdir(image_dir)
-            if f.endswith((".png", ".jpg", ".jpeg"))
-        ]
         display_functions = [
             show_pihole_stats,
             lambda: display_image(random.choice(image_files)),
@@ -77,28 +107,19 @@ def main():
         ]
 
         current_index = 0
+        button_a.when_pressed = skip_next
+        button_b.when_pressed = skip_to_image
 
         while True:
             try:
                 print(f"Calling index {current_index}")
-                print(f"Display function {display_functions[current_index]}")
-                display_functions[current_index]()
+                logger.info(f"Display function {display_functions[current_index]}")
+                with display_lock:
+                    display_functions[current_index]()
 
-                # Wait for 20 minutes or button press
-                start_time = time.time()
-                while time.time() - start_time < 1200:  # 20 minutes
-                    if button_a.is_pressed:
-                        print("Skipping to next function")
-                        break
-                    elif button_b.is_pressed:
-                        current_index = 0
-                        print("Jumping to displaying a picture")
-                        break
-                    elif button_d.is_pressed:
-                        print("Forcing a screen clean")
-                        screen_clear()
-                        break
-                    time.sleep(0.1)  # Check button press every 100ms
+                wake_event.wait(1200)
+                # reset the event for next loop
+                wake_event.clear()
 
                 current_index = (current_index + 1) % len(display_functions)
             except Exception as e:
@@ -116,6 +137,7 @@ def main():
     finally:
         logger.info("Process Exiting")
 
+button_d.when_pressed = screen_clear
 
 if __name__ == "__main__":
     main()
