@@ -16,6 +16,7 @@ from pi_health import display_pi_health
 from speedtest_display import display_speedtest
 from image import display_image as show_image
 from clear import run_clear
+from train_status import show_train_status
 from gpiozero import Button
 
 # Paths
@@ -104,6 +105,7 @@ def main():
             display_weather,
             display_pi_health,
             display_speedtest,
+            show_train_status,
         ]
 
         current_index = 0

@@ -15,7 +15,14 @@
       "Bash(python3 -m json.tool)",
       "WebFetch(domain:github.com)",
       "Bash(python3 -m py_compile main.py)",
-      "Bash(python3 *)"
+      "Bash(python3 *)",
+      "WebSearch",
+      "WebFetch(domain:www.realtimetrains.co.uk)",
+      "WebFetch(domain:api-portal.rtt.io)",
+      "WebFetch(domain:realtimetrains.github.io)",
+      "Bash(python3 -c \"from PIL import Image; im = Image.open\\('resources/imgs/rail.png'\\); print\\(im.size, im.mode\\)\")",
+      "Bash(python -c \"from PIL import Image; im = Image.open\\('resources/imgs/rail.png'\\); print\\(im.size, im.mode\\)\")",
+      "Bash(git mv *)"
     ]
   }
 }

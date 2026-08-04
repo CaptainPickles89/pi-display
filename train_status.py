@@ -113,6 +113,7 @@ def get_timetable():
             depature_station = departing
             calling_station = calling
             cancelled = service["temporalData"]["departure"]["isCancelled"]
+            cancel_reason = service["temporalData"]["departure"]["cancellationReasonCode"]
             heading_to = service["destination"][0]["location"]["description"]
             platform = service["locationMetadata"]["platform"]["forecast"]
             coaches = service["locationMetadata"]["numberOfVehicles"]
@@ -133,10 +134,9 @@ def get_timetable():
                     "coaches": coaches,
                     "platform": platform,
                     "cancelled": cancelled,
+                    "cancel_reason": cancel_reason,
                 }
             )
-
-        print(trains)
 
     except Exception as e:
         print(f"ERROR; {e}")
@@ -160,47 +160,48 @@ def draw_train_card(draw, box, train, font_time, font_dest, font_meta):
 
     x0, y0, x1, y1 = box
 
-    # Cancelled trains get a red outline, delayed get orange, on-time stay black
+    # Single source of truth for status colour - reused for both the card
+    # outline and the status text so they always match.
     if train["cancelled"]:
-        outline_colour = "red"
+        status_colour = "red"
+        if train.get("cancel_reason"):
+            status_text = f"Cancelled\n{train['cancel_reason']}"
+        else:
+            status_text = "Cancelled"
     elif train["delayed"]:
-        outline_colour = "orange"
+        status_colour = "orange"
+        status_text = f"Delayed\nEst {format_time(train['estimated'])}"
     else:
-        outline_colour = "black"
+        status_colour = "black"
+        status_text = "On time"
 
     draw.rounded_rectangle(
-        box, radius=CARD_RADIUS, outline=outline_colour, width=2, fill="white"
+        box, radius=CARD_RADIUS, outline=status_colour, width=2, fill="white"
     )
 
     pad = CARD_PADDING
     text_top = y0 + pad
     text_bottom = y1 - pad
 
-    # --- Left block: big departure time (+ estimated time under it if delayed) ---
+    # --- Left block: big departure time + status underneath ---
     departure_hm = format_time(train["departure"])
     time_x = x0 + pad
     draw.text((time_x, text_top), departure_hm, font=font_time, fill="black")
 
-    if train["cancelled"]:
-        status_text = "CANCELLED"
-        status_colour = "red"
-    elif train["delayed"]:
-        status_text = f"Exp {format_time(train['estimated'])}"
-        status_colour = "orange"
-    else:
-        status_text = "On time"
-        status_colour = "black"
-
     time_bbox = draw.textbbox((time_x, text_top), departure_hm, font=font_time)
-    draw.text(
+    draw.multiline_text(
         (time_x, time_bbox[3] + 2), status_text, font=font_meta, fill=status_colour
     )
 
-    # --- Middle: destination ---
-    dest_x = (
-        x0 + (x1 - x0) // 2 - 40
-    )  # TODO: tune - shift so it sits after the time block
-    draw.text((dest_x, text_top), train["heading_to"], font=font_dest, fill="black")
+    # --- Middle: destination, horizontally centred in the card ---
+    dest_centre_x = x0 + (x1 - x0) // 2
+    draw.text(
+        (dest_centre_x, text_top),
+        train["heading_to"],
+        font=font_dest,
+        fill="black",
+        anchor="ma",
+    )
 
     # --- Right block: platform / coaches, right-aligned ---
     meta_text = f"Plat {train['platform']}\n{train['coaches']} coaches"
@@ -216,10 +217,18 @@ def draw_header(draw, img, display_width, from_name, to_name, font_header):
     """Draw the From (left) / logo (center) / To (right) band. Shared by the
     normal board and the no-trains fallback screen."""
     header_margin = 20
-    from_bbox = draw.textbbox((0, 0), from_name, font=font_header)
-    from_height = from_bbox[3] - from_bbox[1]
-    from_y = (HEADER_HEIGHT - from_height) // 2
-    draw.text((header_margin, from_y), from_name, font=font_header, fill="black")
+    header_mid_y = HEADER_HEIGHT // 2
+
+    # anchor="lm"/"rm" centers on the font's metrics (ascent/descent), not the
+    # ink bbox of each string - keeps "Biggleswade" (has a descender) and
+    # "St Pancras" (no descender) sat on the same row instead of drifting.
+    draw.text(
+        (header_margin, header_mid_y),
+        from_name,
+        font=font_header,
+        fill="black",
+        anchor="lm",
+    )
 
     with Image.open(LOGO_PATH).convert("RGBA") as logo:
         logo_size = 64  # TODO: tune - native is 316x316
@@ -228,12 +237,13 @@ def draw_header(draw, img, display_width, from_name, to_name, font_header):
         logo_y = (HEADER_HEIGHT - logo_size) // 2
         img.paste(logo, (logo_x, logo_y), logo)
 
-    to_bbox = draw.textbbox((0, 0), to_name, font=font_header)
-    to_width = to_bbox[2] - to_bbox[0]
-    to_height = to_bbox[3] - to_bbox[1]
-    to_x = display_width - header_margin - to_width
-    to_y = (HEADER_HEIGHT - to_height) // 2
-    draw.text((to_x, to_y), to_name, font=font_header, fill="black")
+    draw.text(
+        (display_width - header_margin, header_mid_y),
+        to_name,
+        font=font_header,
+        fill="black",
+        anchor="rm",
+    )
 
 
 def draw_train_board(from_name, to_name, trains):
@@ -247,7 +257,7 @@ def draw_train_board(from_name, to_name, trains):
 
     font_header = ImageFont.truetype(FONT_PATH, 28)  # From / To labels
     font_time = ImageFont.truetype(FONT_TIME, 32)  # big departure time on each card
-    font_dest = ImageFont.truetype(FONT_PATH, 24)  # destination name on each card
+    font_dest = ImageFont.truetype(FONT_PATH, 26)  # destination name on each card
     font_meta = ImageFont.truetype(FONT_PATH, 18)  # status / platform / coaches
 
     draw_header(draw, img, display_width, from_name, to_name, font_header)
@@ -294,10 +304,14 @@ def draw_no_trains(from_name, to_name):
     inky.show()
 
 
-if __name__ == "__main__":
+def show_train_status():
     trains = get_timetable()
 
     if trains:
         draw_train_board(trains[0]["departing_from"], trains[0]["calling_at"], trains)
     else:
         draw_no_trains("Biggleswade", "St Pancras")
+
+
+if __name__ == "__main__":
+    show_train_status()
