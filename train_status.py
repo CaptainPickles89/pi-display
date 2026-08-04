@@ -77,7 +77,7 @@ def get_timetable():
     trains = []
 
     try:
-        if in_between(datetime.now().time(), time(0), time(12)):
+        if in_between(datetime.now().time(), time(0), time(15)):
             print("Checking agaist morning trains")
             departing = "Biggleswade"
             calling = "St Pancras"
@@ -87,7 +87,7 @@ def get_timetable():
             response.raise_for_status()
             data = response.json()
 
-        elif in_between(datetime.now().time(), time(12), time(20)):
+        elif in_between(datetime.now().time(), time(15), time(20)):
             print("Checking agaist afternoon trains")
             departing = "Kings Cross"
             calling = "Biggleswade"
@@ -107,21 +107,33 @@ def get_timetable():
             response.raise_for_status()
             data = response.json()
 
-        for service in data["services"][:3]:
+        for service in data.get("services", [])[:3]:
             departure_time = service["temporalData"]["departure"]["scheduleAdvertised"]
             estimated_time = service["temporalData"]["departure"]["realtimeForecast"]
             depature_station = departing
             calling_station = calling
-            cancelled = service["temporalData"]["departure"]["isCancelled"]
-            cancel_reason = service["temporalData"]["departure"]["cancellationReasonCode"]
+            cancelled = service["temporalData"]["departure"]["isCancelled"]           
             heading_to = service["destination"][0]["location"]["description"]
-            platform = service["locationMetadata"]["platform"]["forecast"]
             coaches = service["locationMetadata"]["numberOfVehicles"]
 
             if estimated_time != departure_time and cancelled != True:
                 delayed = True
             else:
                 delayed = False
+
+            cancellation_reason_code = service["temporalData"]["departure"].get("cancellationReasonCode")
+            if cancelled == True and not cancellation_reason_code:
+                cancel_reason = "N/A"
+            else:
+                cancel_reason = cancellation_reason_code
+
+            platform_data = service["locationMetadata"].get("platform") or {}
+            platform = (
+                platform_data.get("actual")
+                or platform_data.get("forecast")
+                or platform_data.get("planned")
+                or ""
+            )
 
             trains.append(
                 {
@@ -140,6 +152,7 @@ def get_timetable():
 
     except Exception as e:
         print(f"ERROR; {e}")
+        traceback.print_exc()
 
     return trains
 
@@ -281,6 +294,7 @@ def draw_train_board(from_name, to_name, trains):
 def draw_no_trains(from_name, to_name):
     """Fallback screen: still show the From / logo / To header so the board
     doesn't fail silently, with a message below instead of cards."""
+    print("No trains to display")
     inky = get_display()
 
     img = Image.new("RGB", inky.resolution, "white")
